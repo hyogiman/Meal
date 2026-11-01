@@ -196,18 +196,124 @@ function renderDays(){
 }
 function selectDay(day){selectedDay=day;$$('.day-panel').forEach(el=>el.hidden=el.dataset.panel!==day);$$('.week-day').forEach(el=>{const active=el.dataset.day===day;el.classList.toggle('active',active);el.setAttribute('aria-pressed',String(active));});}
 function setTab(name){$$('.navbtn').forEach(el=>el.setAttribute('aria-selected',String(el.id===`tab-${name}`)));$$('.view').forEach(el=>el.hidden=el.id!==`view-${name}`);}
-let owned=[];
-try {owned=JSON.parse(localStorage.getItem('meal_80000_owned_v2')||'[]');if(!Array.isArray(owned))owned=[];} catch(e){owned=[];}
-function saveOwned(){try{localStorage.setItem('meal_80000_owned_v2',JSON.stringify(owned));}catch(e){/* Some local file browsers disable storage */}}
-function renderShopping(){
- const root=$('#shopping-list');root.innerHTML=shopping.map(g=>`<section class="shop-group"><h3>${g.group}<span>${formatter(g.items.reduce((s,x)=>s+x[1],0))}</span></h3>${g.items.map(([name,price])=>`<label class="shop-item"><input type="checkbox" data-product="${escapeHTML(name)}" ${owned.includes(name)?'checked':''}/><span class="itemname">${escapeHTML(name)}</span><span class="price">${formatter(price)}</span></label>`).join('')}</section>`).join('');
- $$('.shop-item input',root).forEach(el=>el.addEventListener('change',()=>{const name=el.dataset.product;owned=el.checked?[...new Set([...owned,name])]:owned.filter(x=>x!==name);saveOwned();updateTotals();}));addLedgerQuickButtons();updateTotals();
+
+const SHOP_KEY='meal_shopping_flow_v1';
+let plans={};
+try{const p=JSON.parse(localStorage.getItem(SHOP_KEY)||'{}');if(p&&typeof p==='object'&&!Array.isArray(p))plans=p;}catch(e){}
+let shopWeek=weekStart(dateISO(new Date())),shopStep=1;
+const ingredients=shopping.flatMap(g=>g.items.map(([name,estimate])=>({name,estimate,category:g.group})));
+if(!plans._migrated){
+ let old=[];try{old=JSON.parse(localStorage.getItem('meal_80000_owned_v2')||'[]');}catch(e){}
+ if(Array.isArray(old)&&old.length&&!plans[shopWeek])plans[shopWeek]={owned:old.filter(n=>typeof n==='string'),skipped:[],closed:false};
+ plans._migrated=true;try{localStorage.setItem(SHOP_KEY,JSON.stringify(plans));}catch(e){}
 }
-function updateTotals(){const all=shopping.flatMap(g=>g.items);const required=all.reduce((s,[name,price])=>s+(owned.includes(name)?0:price),0);$('#requiredCost').textContent=formatter(required);$('#budgetLeft').textContent=formatter(BUDGET-required);$('#budgetLeft').style.color=required>BUDGET?'#b53b35':'#176c52';$('#costProgress').style.width=`${Math.min(100,required/BUDGET*100)}%`;$('#checkCount').textContent=`집에 있는 식재료 ${all.filter(([name])=>owned.includes(name)).length}/${all.length}개 체크 · 예상 구매액 ${formatter(required)}`;}
+function getPlan(){
+ if(!plans[shopWeek]||typeof plans[shopWeek]!=='object')plans[shopWeek]={owned:[],skipped:[],closed:false};
+ const p=plans[shopWeek];if(!Array.isArray(p.owned))p.owned=[];if(!Array.isArray(p.skipped))p.skipped=[];
+ return p;
+}
+function savePlan(){try{localStorage.setItem(SHOP_KEY,JSON.stringify(plans));return true;}catch(e){shopMessage('브라우저 저장이 막혀 있습니다. 상태가 유지되지 않을 수 있습니다.');return false;}}
+function shopMessage(msg){$('#shopStatus').textContent=msg;}
+function purchased(name){return expenses.find(x=>x.planWeek===shopWeek&&x.planKey===name);}
+function weekExpenses(){const end=shiftDay(shopWeek,6);return expenses.filter(x=>x.date>=shopWeek&&x.date<=end);}
+function validateShoppingDate(){
+ const d=$('#shopDate').value;if(!parseLocalDay(d)||d<shopWeek||d>shiftDay(shopWeek,6)){shopMessage('구매 날짜를 선택된 장보기 주간 안으로 맞춰 주세요.');return null;}return d;
+}
+function resetShopDate(){const today=dateISO(new Date());$('#shopDate').value=today>=shopWeek&&today<=shiftDay(shopWeek,6)?today:shopWeek;}
+function shoppingStats(){
+ const p=getPlan(),home=ingredients.filter(x=>p.owned.includes(x.name)),bought=ingredients.filter(x=>purchased(x.name));
+ const pending=ingredients.filter(x=>!p.owned.includes(x.name)&&!p.skipped.includes(x.name)&&!purchased(x.name));
+ const skipped=ingredients.filter(x=>p.skipped.includes(x.name));
+ const spent=weekExpenses().reduce((a,x)=>a+x.cost,0);
+ return {p,home,bought,pending,skipped,spent,expected:pending.reduce((a,x)=>a+x.estimate,0)};
+}
+function renderShopping(){
+ const t=shoppingStats(),extra=expenses.filter(x=>x.planWeek===shopWeek&&x.planKey==='__extra__');
+ $('#shopWeek').textContent=shopWeek.replace(/-/g,'.')+' ~ '+shiftDay(shopWeek,6).replace(/-/g,'.');
+ $('#requiredCost').textContent=formatter(t.expected);$('#shopSpent').textContent=formatter(t.spent);
+ $('#budgetLeft').textContent=(t.spent>BUDGET?'-':'')+formatter(Math.abs(BUDGET-t.spent));
+ $('#shopBudgetCard').classList.toggle('over',t.spent>BUDGET);
+ $('#costProgress').style.width=Math.min(100,t.spent/BUDGET*100)+'%';
+ $('#costProgress').style.background=t.spent>BUDGET?'#b34137':'#176c52';
+ $('#checkCount').textContent='집에 있음 '+t.home.length+'개 · 구매 완료 '+t.bought.length+'개 · 살 것 '+t.pending.length+'개 · 이번 주 안 삼 '+t.skipped.length+'개';
+ $('#shopInventory').innerHTML=shopping.map(g=>'<div class="shop-block"><h4>'+escapeHTML(g.group)+' <small class="shop-meta">'+g.items.length+'개</small></h4>'+g.items.map(([name,price])=>{
+  const checked=t.p.owned.includes(name),done=!!purchased(name);
+  return '<label class="stock-line '+(checked?'checked':'')+'"><input type="checkbox" data-owned="'+escapeHTML(name)+'" '+(checked?'checked':'')+' '+(done||t.p.closed?'disabled':'')+'><span>'+escapeHTML(name)+(done?'<br><small>구매 기록이 있어 아래 구매 단계에서 취소해야 합니다.</small>':'')+'</span><small>'+formatter(price)+' 예상</small></label>';
+ }).join('')+'</div>').join('');
+ $('#shopPendingTitle').textContent='아직 살 것 · '+t.pending.length+'개 / 예상 '+formatter(t.expected);
+ $('#shopPending').innerHTML=t.pending.length?t.pending.map(x=>'<div class="buy-line"><div class="buy-head"><strong>'+escapeHTML(x.name)+'</strong><small>예상 '+formatter(x.estimate)+'</small></div><div class="buy-controls"><input type="number" min="1" max="99999999" step="1" inputmode="numeric" placeholder="실제 가격" aria-label="'+escapeHTML(x.name)+' 실제 가격"><button class="shop-primary" data-buy="'+escapeHTML(x.name)+'" '+(t.p.closed?'disabled':'')+'>구매 완료</button><button class="shop-alt" data-skip="'+escapeHTML(x.name)+'" '+(t.p.closed?'disabled':'')+'>이번 주 안 삼</button></div></div>').join(''):'<div class="shop-empty">구매할 미처리 재료가 없습니다.</div>';
+ if(t.skipped.length)$('#shopPending').insertAdjacentHTML('beforeend','<h4>이번 주 안 사는 품목</h4>'+t.skipped.map(x=>'<div class="buy-line"><div class="buy-head"><strong>'+escapeHTML(x.name)+'</strong><small>이번 주 안 삼</small></div><button class="shop-alt" data-unskip="'+escapeHTML(x.name)+'" '+(t.p.closed?'disabled':'')+'>다시 구매 목록으로</button></div>').join(''));
+ const boughtMarkup=t.bought.map(x=>{
+  const record=purchased(x.name);
+  return '<div class="buy-line" style="background:#f5fbf6"><div class="buy-head"><strong>✓ '+escapeHTML(x.name)+'</strong><small>'+record.date+' · '+formatter(record.cost)+'</small></div><div class="buy-controls"><input type="number" min="1" max="99999999" step="1" inputmode="numeric" value="'+record.cost+'" aria-label="'+escapeHTML(x.name)+' 수정 금액"><button class="shop-alt" data-correct="'+escapeHTML(x.name)+'" '+(t.p.closed?'disabled':'')+'>금액 수정</button><button class="shop-alt" data-unbuy="'+escapeHTML(x.name)+'" '+(t.p.closed?'disabled':'')+'>구매 취소</button></div></div>';
+ }).join('');
+ const extraMarkup=extra.map(x=>'<div class="buy-line" style="background:#f5fbf6"><div class="buy-head"><strong>✓ '+escapeHTML(x.name)+'</strong><small>추가 구매 · '+formatter(x.cost)+'</small></div><div class="buy-controls"><button class="shop-alt" data-extra-remove="'+escapeHTML(x.id)+'" '+(t.p.closed?'disabled':'')+'>삭제</button></div></div>').join('');
+ $('#shopBought').innerHTML=boughtMarkup+extraMarkup||'<div class="shop-empty">아직 구매 완료한 물건이 없습니다.</div>';
+ const others=weekExpenses().filter(x=>!(x.planWeek===shopWeek&&ingredients.some(i=>i.name===x.planKey))).reduce((sum,x)=>sum+x.cost,0);
+ $('#shopResult').innerHTML='<div class="shop-result"><div><span>집에 있어서 제외</span><strong>'+t.home.length+'개</strong></div><div><span>실제 구매 완료</span><strong>'+t.bought.length+'개</strong></div><div><span>이번 주 실제 지출</span><strong>'+formatter(t.spent)+'</strong></div><div><span>8만 원 중 남은 예산</span><strong>'+((t.spent>BUDGET?'-':'')+formatter(Math.abs(BUDGET-t.spent)))+'</strong></div></div>'+
+ '<p class="shop-meta">아직 살 재료 '+t.pending.length+'개(예상 '+formatter(t.expected)+') · 이번 주 안 삼 '+t.skipped.length+'개</p>'+
+ '<h4>구매 완료한 물건</h4><ul class="shop-receipt">'+(t.bought.map(x=>'<li><span>'+escapeHTML(x.name)+'</span><b>'+formatter(purchased(x.name).cost)+'</b></li>').join('')+extra.map(x=>'<li><span>'+escapeHTML(x.name)+' (추가)</span><b>'+formatter(x.cost)+'</b></li>').join('')||'<li>아직 구매 기록이 없습니다.</li>')+'</ul>'+
+ '<p class="shop-meta">구매 완료 이외에 가계부에 직접 입력한 지출을 포함하여 이번 주 총 '+formatter(t.spent)+'입니다.'+(others?' 계획 품목 외 지출 '+formatter(others)+'이 포함됩니다.':'')+'</p>';
+ $('#shopFinish').hidden=!!t.p.closed;$('#shopReopen').hidden=!t.p.closed;
+ $('#shopCompleteText').hidden=!t.p.closed;$('#shopCompleteText').textContent=t.p.closed?'정산 완료 상태입니다. 수정하려면 정산 다시 열기를 눌러 주세요.':'';
+ $('#shopExtraAdd').disabled=!!t.p.closed;
+}
+function setShopStep(n){shopStep=n;$$('.shop-step').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.step===n)));$$('.shop-panel').forEach(p=>p.hidden=+p.dataset.panelStep!==n);renderShopping();}
+function changeShopWeek(n){shopWeek=n;resetShopDate();renderShopping();shopMessage('선택한 주간으로 이동했습니다. 주별 장보기 상태는 따로 저장됩니다.');}
+$('#shopPrev').addEventListener('click',()=>changeShopWeek(shiftDay(shopWeek,-7)));
+$('#shopNext').addEventListener('click',()=>changeShopWeek(shiftDay(shopWeek,7)));
+$('#shopToday').addEventListener('click',()=>changeShopWeek(weekStart(dateISO(new Date()))));
+$$('[data-step]').forEach(b=>b.addEventListener('click',()=>setShopStep(+b.dataset.step)));
+$$('[data-to-step]').forEach(b=>b.addEventListener('click',()=>setShopStep(+b.dataset.toStep)));
+$('#shopInventory').addEventListener('change',e=>{
+ const b=e.target.closest('input[data-owned]');if(!b)return;
+ const p=getPlan(),name=b.dataset.owned;
+ if(p.closed||purchased(name)){b.checked=!b.checked;shopMessage('구매 기록이 있거나 정산된 품목입니다. 먼저 구매 취소 또는 정산 다시 열기를 눌러 주세요.');return;}
+ p.owned=b.checked?[...new Set([...p.owned,name])]:p.owned.filter(x=>x!==name);if(b.checked)p.skipped=p.skipped.filter(x=>x!==name);
+ savePlan();shopMessage(name+(b.checked?' : 집에 있어서 구매 목록에서 제외했습니다.':' : 구매 목록으로 복귀했습니다.'));renderShopping();
+});
+$('#shopPending').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b||getPlan().closed)return;
+ const name=b.dataset.buy||b.dataset.skip||b.dataset.unskip;if(!name)return;
+ const p=getPlan();
+ if(b.dataset.skip){p.skipped=[...new Set([...p.skipped,name])];savePlan();renderShopping();shopMessage(name+'을 이번 주 안 사는 물건으로 옮겼습니다.');return;}
+ if(b.dataset.unskip){p.skipped=p.skipped.filter(x=>x!==name);savePlan();renderShopping();shopMessage(name+'을 다시 구매 목록에 넣었습니다.');return;}
+ const date=shopDateValid();if(!date)return;
+ const input=b.closest('.buy-line').querySelector('input'),cost=Number(input.value);
+ if(!Number.isSafeInteger(cost)||cost<=0||cost>99999999){input.focus();shopMessage('실제 결제금액을 1원 이상으로 입력하세요.');return;}
+ if(purchased(name)){shopMessage('이미 구매 완료된 물건입니다.');return;}
+ const item=ingredients.find(x=>x.name===name);
+ const record=normalizeExpense({id:Date.now()+'_'+Math.random().toString(36).slice(2),date,name,cost,category:item.category,store:$('#shopStore').value,memo:'식단 장보기',planWeek:shopWeek,planKey:name});
+ expenses.push(record);storeExpenses();renderExpenses();renderShopping();shopMessage(name+'을 실제 '+formatter(cost)+'에 구매 완료로 기록했습니다.');
+});
+function shopDateValid(){const d=$('#shopDate').value;if(!parseLocalDay(d)||d<shopWeek||d>shiftDay(shopWeek,6)){shopMessage('구매 날짜는 현재 선택한 주간 안이어야 합니다.');return null;}return d;}
+$('#shopBought').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b||getPlan().closed)return;
+ if(b.dataset.extraRemove){const item=expenses.find(x=>x.id===b.dataset.extraRemove);if(!item||!confirm(item.name+' 추가 구매 '+formatter(item.cost)+'을 삭제할까요?'))return;expenses=expenses.filter(x=>x.id!==item.id);storeExpenses();renderExpenses();renderShopping();return;}
+ const name=b.dataset.correct||b.dataset.unbuy,record=purchased(name);if(!record)return;
+ if(b.dataset.unbuy){if(!confirm(name+'의 실제 구매 기록을 취소할까요? 가계부에서도 삭제됩니다.'))return;expenses=expenses.filter(x=>x.id!==record.id);storeExpenses();renderExpenses();renderShopping();shopMessage(name+' 구매를 취소했습니다.');return;}
+ const input=b.closest('.buy-line').querySelector('input'),cost=Number(input.value);
+ if(!Number.isSafeInteger(cost)||cost<=0||cost>99999999){input.focus();shopMessage('1원 이상의 실제 가격을 입력하세요.');return;}
+ record.cost=cost;storeExpenses();renderExpenses();renderShopping();shopMessage(name+' 실제 구매 가격을 '+formatter(cost)+'으로 수정했습니다.');
+});
+$('#shopExtra').addEventListener('submit',e=>{
+ e.preventDefault();if(getPlan().closed)return;
+ const date=shopDateValid();if(!date)return;
+ const record=normalizeExpense({id:Date.now()+'_'+Math.random().toString(36).slice(2),date,name:$('#shopExtraName').value,cost:$('#shopExtraCost').value,category:$('#shopExtraCategory').value,store:$('#shopStore').value,memo:'추가 장보기',planWeek:shopWeek,planKey:'__extra__'});
+ if(!record){shopMessage('추가 구매의 품목과 실제 가격을 입력해 주세요.');return;}
+ expenses.push(record);storeExpenses();renderExpenses();$('#shopExtra').reset();renderShopping();shopMessage(record.name+' 추가 구매 '+formatter(record.cost)+'을 저장했습니다.');
+});
+$('#shopFinish').addEventListener('click',()=>{
+ const t=shoppingStats();
+ if(t.pending.length&&!confirm('아직 사지 않은 품목 '+t.pending.length+'개가 남아 있습니다. 미구매 상태로 남겨두고 정산 완료할까요?'))return;
+ getPlan().closed=true;savePlan();setShopStep(3);shopMessage('이 주의 장보기를 정산 완료했습니다.');
+});
+$('#shopReopen').addEventListener('click',()=>{getPlan().closed=false;savePlan();renderShopping();shopMessage('정산을 다시 열었습니다.');});
+$('#shopOpenLedger').addEventListener('click',()=>{selectedWeek=shopWeek;renderExpenses();setTab('ledger');});
+resetShopDate();
 function openAll(isOpen){expanded=isOpen;$$('.recipe').forEach(el=>el.open=isOpen);$('#expandBtn').textContent=isOpen?'조리법 모두 닫기':'조리법 모두 열기';}
 $$('.navbtn').forEach(el=>el.addEventListener('click',()=>setTab(el.id.replace('tab-',''))));
 $('#expandBtn').addEventListener('click',()=>{setTab('recipes');openAll(!expanded);});
-$('#resetBtn').addEventListener('click',()=>{owned=[];saveOwned();renderShopping();});
 
 const LEDGER_STORAGE='meal_real_expenses_v1';
 const ledgerCats=['주식·가공식품','단백질','채소','과일·유제품','양념·기타','간식·음료'];
@@ -215,7 +321,7 @@ const dateISO=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(
 function parseLocalDay(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return null;const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2],12);return dateISO(d)===s?d:null;}
 function shiftDay(s,n){const d=parseLocalDay(s);d.setDate(d.getDate()+n);return dateISO(d);}
 function weekStart(s){const d=parseLocalDay(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return dateISO(d);}
-function normalizeExpense(r){if(!r||!parseLocalDay(r.date))return null;const cost=Number(r.cost),name=String(r.name||'').trim().slice(0,80);if(!name||!Number.isSafeInteger(cost)||cost<1||cost>99999999)return null;return {id:String(r.id||'').slice(0,80)||String(Date.now())+'_'+Math.random(),date:r.date,name:name,cost:cost,category:ledgerCats.includes(r.category)?r.category:'양념·기타',store:String(r.store||'').slice(0,60),memo:String(r.memo||'').slice(0,100)};}
+function normalizeExpense(r){if(!r||!parseLocalDay(r.date))return null;const cost=Number(r.cost),name=String(r.name||'').trim().slice(0,80);if(!name||!Number.isSafeInteger(cost)||cost<1||cost>99999999)return null;return {id:String(r.id||'').slice(0,80)||String(Date.now())+'_'+Math.random(),date:r.date,name:name,cost:cost,category:ledgerCats.includes(r.category)?r.category:'양념·기타',store:String(r.store||'').slice(0,60),memo:String(r.memo||'').slice(0,100),planWeek:parseLocalDay(r.planWeek)?r.planWeek:'',planKey:String(r.planKey||'').slice(0,90)};}
 let expenses=[],selectedWeek=weekStart(dateISO(new Date())),editingExpense=null;
 try{const a=JSON.parse(localStorage.getItem(LEDGER_STORAGE)||'[]');if(Array.isArray(a))expenses=a.map(normalizeExpense).filter(Boolean);}catch(e){expenses=[];}
 function ledgerMsg(s){$('#ledgerMessage').textContent=s;}
@@ -233,12 +339,6 @@ function renderExpenses(){
  const sorted=list.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
  $('#ledgerRecords').innerHTML=sorted.length?sorted.map(e=>'<div class="ledger-record"><div><b>'+escapeHTML(e.name)+'</b><small>'+e.date.replace(/-/g,'.')+' · '+escapeHTML(e.category)+(e.store?' · '+escapeHTML(e.store):'')+(e.memo?' · '+escapeHTML(e.memo):'')+'</small></div><div class="ledger-record-amount">'+formatter(e.cost)+'<div><button type="button" data-edit="'+escapeHTML(e.id)+'">수정</button><button type="button" data-del="'+escapeHTML(e.id)+'">삭제</button></div></div></div>').join(''):'<div class="ledger-empty">이 주에 입력된 지출이 없습니다.<br>영수증의 실제 금액을 기록해 주세요.</div>';
 }
-function addLedgerQuickButtons(){
- $$('.shop-group').forEach((group,i)=>$$('.shop-item',group).forEach(label=>{
-  const name=label.querySelector('input').dataset.product,b=document.createElement('button');b.type='button';b.className='ledger-quick';b.textContent='+ 실제 지출';
-  b.addEventListener('click',()=>{setTab('ledger');clearExpenseForm();$('#ledgerItem').value=name;$('#ledgerCategory').value=ledgerCats.includes(shopping[i].group)?shopping[i].group:'양념·기타';selectedWeek=weekStart(dateISO(new Date()));renderExpenses();ledgerMsg('품목을 가져왔습니다. 실제 구매 금액을 입력하세요.');$('#ledgerFormCard').scrollIntoView({block:'start',behavior:'smooth'});$('#ledgerAmount').focus({preventScroll:true});});label.insertAdjacentElement('afterend',b);
- }));
-}
 $('#ledgerPrev').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,-7);renderExpenses();});
 $('#ledgerNext').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,7);renderExpenses();});
 $('#ledgerCurrent').addEventListener('click',()=>{selectedWeek=weekStart(dateISO(new Date()));renderExpenses();});
@@ -246,14 +346,14 @@ $('#ledgerCancel').addEventListener('click',()=>{clearExpenseForm();ledgerMsg('�
 $('#ledgerForm').addEventListener('submit',ev=>{
  ev.preventDefault();const r=normalizeExpense({date:$('#ledgerDate').value,name:$('#ledgerItem').value,cost:$('#ledgerAmount').value,category:$('#ledgerCategory').value,store:$('#ledgerStore').value,memo:$('#ledgerMemo').value});
  if(!r){ledgerMsg('구매일, 품목명, 1원 이상의 실제 금액을 확인해 주세요.');return;}
- const updating=editingExpense!==null;r.id=editingExpense||(String(Date.now())+'_'+Math.random().toString(36).slice(2));
+ const updating=editingExpense!==null;const prior=updating?expenses.find(x=>x.id===editingExpense):null;if(prior){r.planWeek=prior.planWeek;r.planKey=prior.planKey;}r.id=editingExpense||(String(Date.now())+'_'+Math.random().toString(36).slice(2));
  expenses=updating?expenses.map(e=>e.id===editingExpense?r:e):[...expenses,r];
- const ok=storeExpenses();selectedWeek=weekStart(r.date);clearExpenseForm();renderExpenses();if(ok)ledgerMsg(updating?'구매 내역을 수정했습니다.':'실제 결제금액을 저장했습니다.');
+ const ok=storeExpenses();selectedWeek=weekStart(r.date);clearExpenseForm();renderExpenses();renderShopping();if(ok)ledgerMsg(updating?'구매 내역을 수정했습니다.':'실제 결제금액을 저장했습니다.');
 });
 $('#ledgerRecords').addEventListener('click',ev=>{
  const btn=ev.target.closest('button[data-edit],button[data-del]');if(!btn)return;
  const id=btn.dataset.edit||btn.dataset.del,r=expenses.find(e=>e.id===id);if(!r)return;
- if(btn.dataset.del){if(!confirm('“'+r.name+'” '+formatter(r.cost)+' 기록을 삭제할까요?'))return;expenses=expenses.filter(e=>e.id!==id);const ok=storeExpenses();if(editingExpense===id)clearExpenseForm();renderExpenses();if(ok)ledgerMsg('기록을 삭제했습니다.');return;}
+ if(btn.dataset.del){if(!confirm('“'+r.name+'” '+formatter(r.cost)+' 기록을 삭제할까요?'))return;expenses=expenses.filter(e=>e.id!==id);const ok=storeExpenses();if(editingExpense===id)clearExpenseForm();renderExpenses();renderShopping();if(ok)ledgerMsg('기록을 삭제했습니다.');return;}
  editingExpense=id;$('#ledgerDate').value=r.date;$('#ledgerItem').value=r.name;$('#ledgerCategory').value=r.category;$('#ledgerAmount').value=r.cost;$('#ledgerStore').value=r.store;$('#ledgerMemo').value=r.memo;$('#ledgerSave').textContent='수정 내용 저장';$('#ledgerFormTitle').textContent='✏️ 구매 기록 수정';$('#ledgerCancel').hidden=false;$('#ledgerFormCard').scrollIntoView({block:'start',behavior:'smooth'});
 });
 function downloadExpense(name,content,type){const url=URL.createObjectURL(new Blob([content],{type:type})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -265,7 +365,7 @@ $('#ledgerFile').addEventListener('change',async ev=>{
  const file=ev.target.files&&ev.target.files[0];if(!file)return;
  try{if(file.size>5000000)throw Error('최대 5MB까지 복원할 수 있습니다.');const data=JSON.parse(await file.text());if(data.app!=='Meal-expenses'||data.version!==1||!Array.isArray(data.records)||data.records.length>10000)throw Error('Meal 가계부 백업 형식이 아닙니다.');
  const rows=data.records.map(normalizeExpense);if(rows.some(r=>!r))throw Error('유효하지 않은 기록이 있습니다.');
- if(!confirm('기존 '+expenses.length+'건의 기록을 백업 파일 '+rows.length+'건으로 교체할까요?'))return;expenses=rows;const ok=storeExpenses();clearExpenseForm();selectedWeek=weekStart(dateISO(new Date()));renderExpenses();if(ok)ledgerMsg(rows.length+'건의 기록을 복원했습니다.');
+ if(!confirm('기존 '+expenses.length+'건의 기록을 백업 파일 '+rows.length+'건으로 교체할까요?'))return;expenses=rows;const ok=storeExpenses();clearExpenseForm();selectedWeek=weekStart(dateISO(new Date()));renderExpenses();renderShopping();if(ok)ledgerMsg(rows.length+'건의 기록을 복원했습니다.');
  }catch(e){ledgerMsg('복원 실패: '+e.message);}finally{ev.target.value='';}
 });
 clearExpenseForm();renderExpenses();

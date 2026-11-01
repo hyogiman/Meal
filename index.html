@@ -75,11 +75,11 @@
 </header>
 <section class="hero">
  <p class="eyebrow">7-DAY MEAL PLAN · 2 PEOPLE</p>
- <h1>8만 원으로<br>매일 다르게 잘 먹기</h1>
+ <h1>8만 원 예산에 맞춰<br>장보기 계획하기</h1>
  <p>카레·생선·닭찜·불고기·비빔밥·국수까지. 같은 식비 안에서 맛과 식감을 바꿨습니다. 요일을 골라 메뉴를 누르면 조리법이 열립니다.</p>
- <div class="hero-stats"><div class="stat"><span>예상 장보기 금액</span><strong>78,300원</strong><small>예산 여유 1,700원</small></div><div class="stat"><span>1인 한 끼</span><strong>약 1,864원</strong><small>42인분으로 단순 배분</small></div><div class="stat"><span>식단 · 레시피</span><strong>7일 · 21개</strong><small>조리법·분량·시간 포함</small></div></div>
+ <div class="hero-stats"><div class="stat"><span>할인가 가정 목표액</span><strong>78,300원</strong><small>실제 판매처별 구매가 미검증</small></div><div class="stat"><span>1인 한 끼</span><strong>약 1,864원</strong><small>42인분으로 단순 배분</small></div><div class="stat"><span>식단 · 레시피</span><strong>7일 · 21개</strong><small>조리법·분량·시간 포함</small></div></div>
 </section>
-<div class="notice print-hide"><strong>예산 가정</strong> · 쌀 5kg 실구매비 포함 · 간장·된장·고추장·식용유·마늘·식초·소금 등 기본 양념은 보유 가정. 가격은 2026년 10월 말 전국 시세를 참고한 <strong>할인·실속 상품 목표가</strong>이며 실제 매장 가격에 따라 8만 원을 넘을 수 있습니다. 아기 이유식·분유는 제외합니다.</div>
+<div class="notice print-hide"><strong>예산 가정</strong> · 쌀 5kg 실구매비 포함 · 간장·된장·고추장·식용유·마늘·식초·소금 등 기본 양념은 보유 가정. 가격은 2026년 10월 말 전국 시세를 참고한 <strong>일부 가격이 실제 구매 가능 여부를 검증하지 않은 추정 목표가</strong>입니다. 78,300원은 실제 결제 가능한 장바구니 총액이 아니며, 판매처·중량·할인·배송 조건에 따라 8만 원을 초과할 수 있습니다. 아기 이유식·분유는 제외합니다.</div>
 <nav class="nav" aria-label="페이지 메뉴" role="tablist"><button id="tab-recipes" class="navbtn" role="tab" aria-controls="view-recipes" aria-selected="true" type="button">🍽️ 7일 식단·조리법</button><button id="tab-shopping" class="navbtn" role="tab" aria-controls="view-shopping" aria-selected="false" type="button">🛒 장보기 진행</button><button id="tab-ledger" class="navbtn" role="tab" aria-controls="view-ledger" aria-selected="false" type="button">📒 지출 내역</button><button id="tab-prep" class="navbtn" role="tab" aria-controls="view-prep" aria-selected="false" type="button">📦 보관·절약 팁</button></nav>
 <main>
  <section id="view-recipes" class="view" role="tabpanel" aria-labelledby="tab-recipes">
@@ -94,13 +94,13 @@
   <div class="section-card">
    <div class="shop-weekbar"><strong id="shopWeek"></strong><div class="shop-actions"><button class="smallbtn" id="shopPrev" type="button">← 이전 주</button><button class="smallbtn" id="shopToday" type="button">이번 주</button><button class="smallbtn" id="shopNext" type="button">다음 주 →</button></div></div>
    <div class="shop-kpis">
-    <div class="shop-kpi"><small>아직 살 재료 예상액</small><strong id="requiredCost">78,300원</strong></div>
+    <div class="shop-kpi"><small>아직 살 재료의 미검증 목표액</small><strong id="requiredCost">78,300원</strong></div>
     <div class="shop-kpi"><small>이번 주 기록된 실제 지출</small><strong id="shopSpent">0원</strong></div>
     <div class="shop-kpi" id="shopBudgetCard"><small>8만 원에서 남은 금액</small><strong id="budgetLeft">80,000원</strong></div>
    </div>
    <div class="progress-bg"><div id="costProgress" class="progress-fg"></div></div>
    <p class="shop-meta" id="checkCount"></p>
-   <p class="shop-meta">예상 금액은 지출로 잡히지 않습니다. 실제로 구매한 금액만 지출 내역에 기록됩니다.</p>
+   <p class="shop-meta">품목별 목표가는 특정 매장에서의 판매가를 검증한 가격이 아닙니다. 실제로 구매한 금액만 지출 내역에 기록됩니다.</p>
   </div>
   <div class="shop-steps">
    <button class="shop-step" data-step="1" aria-pressed="true" type="button"><b>STEP 1</b>🏠 재고 확인</button>

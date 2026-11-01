@@ -29,6 +29,42 @@
 @media(max-width:750px){.ledger-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.ledger-form,.ledger-categories{grid-template-columns:1fr}.ledger-kpi strong{font-size:19px}}
 @media print{#view-ledger,.ledger-quick{display:none!important}}
 
+
+/* Guided grocery journey */
+.shop-weekbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.shop-weekbar strong{font-size:17px}.shop-actions{display:flex;gap:7px;flex-wrap:wrap}
+.shop-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:15px 0 8px}
+.shop-kpi{padding:12px;border:1px solid #dfebe2;background:#f5faf6;border-radius:12px}
+.shop-kpi small{display:block;font-size:11px;color:#617568}.shop-kpi strong{display:block;font-size:21px;letter-spacing:-.5px;color:var(--green)}.shop-kpi.over strong{color:#a83930}
+.shop-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:16px 0}
+.shop-step{min-height:55px;background:#fff;border:1px solid #cedfd2;border-radius:12px;font-weight:800;font-size:13px;color:#566c5c}
+.shop-step b{display:block;font-size:11px}.shop-step[aria-pressed=true]{background:var(--green);color:white;border-color:var(--green)}
+.shop-block{margin-top:15px}.shop-block h4{display:flex;justify-content:space-between;gap:8px;margin:0 0 8px;color:#3a5d48}
+.stock-line,.buy-line{border:1px solid #e1e9e3;border-radius:12px;background:#fff;padding:12px;margin:7px 0}
+.stock-line{display:flex;align-items:center;gap:9px;cursor:pointer}.stock-line input{width:21px;height:21px;accent-color:#176c52;flex:none}
+.stock-line span{flex:1;font-weight:750}.stock-line small,.buy-line small{color:#69796e;font-size:12px}
+.stock-line.checked{opacity:.65;background:#f1f4f1}
+.buy-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.buy-head strong{font-size:15px}
+.buy-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.buy-controls input{width:120px;flex:1;min-width:90px;border:1px solid #cbd9ce;border-radius:9px;min-height:43px;padding:8px 11px;font-size:16px}
+.shop-primary,.shop-alt{min-height:43px;border-radius:9px;padding:9px 13px;font-weight:800;font-size:13px;cursor:pointer;border:0}
+.shop-primary{background:#176c52;color:#fff}.shop-alt{background:#eaf3ec;color:#276448}
+.shop-primary:disabled,.shop-alt:disabled{opacity:.55;cursor:not-allowed}
+.shop-next{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:16px}
+.shop-meta{font-size:13px;color:#5c7461}.shop-panel[hidden]{display:none!important}
+.shop-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.shop-fields label,.shop-extra label{font-size:12px;font-weight:750;display:flex;flex-direction:column;gap:5px;color:#5b6b60}
+.shop-fields input,.shop-extra input,.shop-extra select{min-width:0;width:100%;font-size:16px;padding:9px 11px;min-height:43px;border:1px solid #ccdace;border-radius:9px;background:white;color:var(--text)}
+.shop-extra{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.shop-extra button{grid-column:1/-1;justify-self:start}
+.shop-status{font-size:13px;color:#176c52;font-weight:750;min-height:20px}
+.shop-closed{border:1px solid #c6dfca;background:#f1faf2;border-radius:10px;padding:10px 12px;font-weight:750;color:#176c52}
+.shop-result{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.shop-result div{border:1px solid #e1e9e3;border-radius:11px;padding:12px}
+.shop-result span{font-size:12px;color:#637767;display:block}.shop-result strong{font-size:19px;color:#176c52}
+.shop-receipt{list-style:none;padding:0;margin:10px 0}.shop-receipt li{display:flex;justify-content:space-between;border-bottom:1px solid #edf2ed;padding:8px 0;gap:10px}
+.shop-empty{padding:24px;text-align:center;border:1px dashed #d0ddd2;border-radius:12px;font-size:13px;color:#6a796b}
+@media(max-width:650px){.shop-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.shop-kpi:last-child{grid-column:1/-1}.shop-kpi strong{font-size:19px}.shop-steps{gap:5px}.shop-step{font-size:12px}.shop-fields,.shop-extra{grid-template-columns:1fr}}
+@media print{.shop-steps,.shop-actions,.shop-next,.buy-controls,.shop-extra{display:none!important}}
 </style>
 </head>
 <body>
@@ -44,7 +80,7 @@
  <div class="hero-stats"><div class="stat"><span>예상 장보기 금액</span><strong>78,300원</strong><small>예산 여유 1,700원</small></div><div class="stat"><span>1인 한 끼</span><strong>약 1,864원</strong><small>42인분으로 단순 배분</small></div><div class="stat"><span>식단 · 레시피</span><strong>7일 · 21개</strong><small>조리법·분량·시간 포함</small></div></div>
 </section>
 <div class="notice print-hide"><strong>예산 가정</strong> · 쌀 5kg 실구매비 포함 · 간장·된장·고추장·식용유·마늘·식초·소금 등 기본 양념은 보유 가정. 가격은 2026년 10월 말 전국 시세를 참고한 <strong>할인·실속 상품 목표가</strong>이며 실제 매장 가격에 따라 8만 원을 넘을 수 있습니다. 아기 이유식·분유는 제외합니다.</div>
-<nav class="nav" aria-label="페이지 메뉴" role="tablist"><button id="tab-recipes" class="navbtn" role="tab" aria-controls="view-recipes" aria-selected="true" type="button">🍽️ 7일 식단·조리법</button><button id="tab-shopping" class="navbtn" role="tab" aria-controls="view-shopping" aria-selected="false" type="button">🛒 장보기 목록</button><button id="tab-ledger" class="navbtn" role="tab" aria-controls="view-ledger" aria-selected="false" type="button">💰 장보기 가계부</button><button id="tab-prep" class="navbtn" role="tab" aria-controls="view-prep" aria-selected="false" type="button">📦 보관·절약 팁</button></nav>
+<nav class="nav" aria-label="페이지 메뉴" role="tablist"><button id="tab-recipes" class="navbtn" role="tab" aria-controls="view-recipes" aria-selected="true" type="button">🍽️ 7일 식단·조리법</button><button id="tab-shopping" class="navbtn" role="tab" aria-controls="view-shopping" aria-selected="false" type="button">🛒 장보기 진행</button><button id="tab-ledger" class="navbtn" role="tab" aria-controls="view-ledger" aria-selected="false" type="button">📒 지출 내역</button><button id="tab-prep" class="navbtn" role="tab" aria-controls="view-prep" aria-selected="false" type="button">📦 보관·절약 팁</button></nav>
 <main>
  <section id="view-recipes" class="view" role="tabpanel" aria-labelledby="tab-recipes">
   <div class="section-title"><div><h2>요일별 식단과 레시피</h2><p>총 21끼 · 2인분 기준 · 카레와 닭찜은 4인분 조리 후 다음 끼니 활용</p></div></div>
@@ -52,13 +88,57 @@
   <details class="section-card print-hide" style="margin-bottom:16px"><summary style="cursor:pointer;font-weight:800">📋 7일 메뉴 한눈에 펼쳐보기</summary><div style="overflow-x:auto;margin-top:12px"><table class="quicktable"><thead><tr><th>요일</th><th>아침</th><th>점심</th><th>저녁</th></tr></thead><tbody><tr><th>월</th><td>감자 오믈렛 + 바나나우유</td><td>콩나물 두부맑은국 + 밥</td><td>돼지고기 감자카레라이스</td></tr><tr><th>화</th><td>얼갈이 된장국 + 오이무침 + 밥</td><td>전날 만든 돼지고기 카레덮밥</td><td>고등어 무조림 + 오이초무침 + 밥</td></tr><tr><th>수</th><td>당근 달걀죽</td><td>콩나물 애호박비빔밥</td><td>닭고기 간장찜</td></tr><tr><th>목</th><td>얼갈이 달걀국 + 밥</td><td>전날 닭간장찜 덮밥</td><td>매콤 두부 애호박덮밥</td></tr><tr><th>금</th><td>삶은 달걀·찐 감자·바나나우유</td><td>무채 달걀볶음밥</td><td>얼갈이 돼지불고기 + 달걀말이</td></tr><tr><th>토</th><td>감자채전 + 달걀찜 + 밥</td><td>오이 매콤 비빔국수</td><td>두부 간장조림 + 무맑은국</td></tr><tr><th>일</th><td>채소 달걀볶음밥 + 우유</td><td>대파 달걀 잔치국수</td><td>얼갈이 두부 된장전골</td></tr></tbody></table></div></details>
   <div id="days-container"></div>
  </section>
- <section id="view-shopping" class="view" role="tabpanel" aria-labelledby="tab-shopping" hidden>
-  <div class="section-title"><div><h2>장보기 목록</h2><p>보유한 품목을 체크하면 새로 사야 할 예상금액이 줄어듭니다.</p></div></div>
-  <div class="section-card"><div class="shopping-heading"><div><div class="fine">새로 구매할 예상 금액</div><strong style="font-size:29px;letter-spacing:-1px" id="requiredCost">78,300원</strong></div><div style="text-align:right"><div class="fine">예산 80,000원 중 잔액</div><b style="font-size:20px" id="budgetLeft">1,700원</b></div></div><div class="progress-bg"><div class="progress-fg" id="costProgress"></div></div><p id="checkCount">집에 이미 있는 품목을 체크해 주세요.</p><button type="button" class="smallbtn" id="resetBtn">체크 초기화</button></div>
-  <div class="shopping-list" id="shopping-list"></div>
-  <div class="section-card" style="margin-top:16px"><h3>집에 있다고 가정한 기본 양념 — 예산 미포함</h3><div class="pantry"><span>간장</span><span>된장</span><span>고추장</span><span>식용유</span><span>소금·후추</span><span>다진 마늘</span><span>식초</span><span>선택: 설탕·고춧가루·참기름</span></div><p>쌀 5kg가 이미 있다면 예상 새 구매액은 <b>60,300원</b>으로 내려갑니다. 이 경우에는 과일과 우유, 단백질 식품 보강에 예산을 쓰는 편이 좋습니다. <strong>쌀 5kg 18,000원, 달걀 30개 7,500원은 목표가</strong>라 실제 결제 전 반드시 가격을 확인하세요.</p></div>
- </section>
 
+ <section id="view-shopping" class="view" role="tabpanel" aria-labelledby="tab-shopping" hidden>
+  <div class="section-title"><div><h2>이번 주 장보기</h2><p>집에 있는 재료 제외 → 필요한 것만 구매 → 실제 금액으로 정산</p></div></div>
+  <div class="section-card">
+   <div class="shop-weekbar"><strong id="shopWeek"></strong><div class="shop-actions"><button class="smallbtn" id="shopPrev" type="button">← 이전 주</button><button class="smallbtn" id="shopToday" type="button">이번 주</button><button class="smallbtn" id="shopNext" type="button">다음 주 →</button></div></div>
+   <div class="shop-kpis">
+    <div class="shop-kpi"><small>아직 살 재료 예상액</small><strong id="requiredCost">78,300원</strong></div>
+    <div class="shop-kpi"><small>이번 주 기록된 실제 지출</small><strong id="shopSpent">0원</strong></div>
+    <div class="shop-kpi" id="shopBudgetCard"><small>8만 원에서 남은 금액</small><strong id="budgetLeft">80,000원</strong></div>
+   </div>
+   <div class="progress-bg"><div id="costProgress" class="progress-fg"></div></div>
+   <p class="shop-meta" id="checkCount"></p>
+   <p class="shop-meta">예상 금액은 지출로 잡히지 않습니다. 실제로 구매한 금액만 지출 내역에 기록됩니다.</p>
+  </div>
+  <div class="shop-steps">
+   <button class="shop-step" data-step="1" aria-pressed="true" type="button"><b>STEP 1</b>🏠 재고 확인</button>
+   <button class="shop-step" data-step="2" aria-pressed="false" type="button"><b>STEP 2</b>🛒 가격 입력</button>
+   <button class="shop-step" data-step="3" aria-pressed="false" type="button"><b>STEP 3</b>✅ 정산</button>
+  </div>
+  <div class="shop-panel" data-panel-step="1">
+   <div class="section-card"><h3>집에 있는 재료를 체크해 주세요</h3><p><strong>체크 = 집에 있음 = 구매 목록에서 제외</strong>입니다. 체크하지 않은 품목만 실제 장보기 목록에 남습니다.</p>
+    <div id="shopInventory"></div><div class="shop-next"><span class="shop-meta">구매 완료된 품목은 이 화면에서 변경할 수 없습니다.</span><button class="shop-primary" data-to-step="2" type="button">구매 목록 확인 →</button></div>
+   </div>
+  </div>
+  <div class="shop-panel" data-panel-step="2" hidden>
+   <div class="section-card"><h3>구매한 물건만 실제 가격을 입력하세요</h3><p>실제 결제한 경우에만 ‘구매 완료’를 누릅니다. 예상액은 자동으로 지출에 추가되지 않습니다.</p>
+    <div class="shop-fields"><label>구매 날짜<input type="date" id="shopDate" required></label><label>구매처 (선택)<input id="shopStore" placeholder="예: 마트" maxlength="60"></label></div>
+    <h3 id="shopPendingTitle" style="margin-top:18px"></h3><div id="shopPending"></div>
+    <h3 style="margin-top:22px">구매 완료한 물건</h3><div id="shopBought"></div>
+    <details style="margin:18px 0"><summary style="cursor:pointer;font-weight:800">➕ 계획에 없던 추가 구매 기록</summary>
+     <form class="shop-extra" id="shopExtra">
+      <label>품목 이름<input id="shopExtraName" required maxlength="80" placeholder="예: 할인 사과"></label>
+      <label>실제 금액<input id="shopExtraCost" type="number" min="1" max="99999999" required inputmode="numeric"></label>
+      <label>분류<select id="shopExtraCategory"><option>주식·가공식품</option><option>단백질</option><option>채소</option><option>과일·유제품</option><option>양념·기타</option><option>간식·음료</option></select></label>
+      <button type="submit" id="shopExtraAdd" class="shop-primary">추가 지출 저장</button>
+     </form>
+    </details>
+    <div class="shop-next"><button class="shop-alt" data-to-step="1" type="button">← 재고 확인</button><button class="shop-primary" data-to-step="3" type="button">정산 확인 →</button></div>
+   </div>
+  </div>
+  <div class="shop-panel" data-panel-step="3" hidden>
+   <div class="section-card"><h3>장보기 정산</h3><p>구매하지 않은 품목과 실제 구매 내역을 구분해 보여드립니다.</p>
+    <div id="shopResult"></div>
+    <div class="shop-next"><button class="shop-alt" data-to-step="2" type="button">← 구매 내역 수정</button><button type="button" class="shop-primary" id="shopFinish">이 주 장보기 완료</button><button type="button" class="shop-alt" id="shopReopen" hidden>정산 다시 열기</button></div>
+    <p id="shopCompleteText" class="shop-closed" hidden></p>
+    <button id="shopOpenLedger" type="button" class="smallbtn" style="margin-top:12px">📒 전체 지출 내역 확인</button>
+   </div>
+  </div>
+  <p id="shopStatus" class="shop-status" role="status" aria-live="polite"></p>
+  <div class="section-card"><h3>집에 있다고 가정한 기본 양념</h3><div class="pantry"><span>간장</span><span>된장</span><span>고추장</span><span>식용유</span><span>소금·후추</span><span>다진 마늘</span><span>식초</span></div><p>양념도 새로 샀다면 2단계의 추가 구매에 실제 가격을 적으세요. 구매 전 식단표의 예상가격 총액은 78,300원이며 실제 가격은 다를 수 있습니다.</p></div>
+ </section>
  <section id="view-ledger" class="view" role="tabpanel" aria-labelledby="tab-ledger" hidden>
  <div class="section-title"><div><h2>장보기 가계부</h2><p>실제 지출을 날짜별로 기록하고 주간 80,000원 예산을 관리합니다.</p></div></div>
  <div class="section-card">

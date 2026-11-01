@@ -13,6 +13,22 @@
 @media(max-width:590px){.shell{padding:0 14px 65px}.topbar{padding:16px 0}.brand{font-size:14px}.brand-icon{font-size:17px;padding:5px 9px}.actionbar{gap:5px}.smallbtn{padding:7px 9px;font-size:12px}.hero{padding:24px 20px;border-radius:19px}.hero h1{font-size:30px}.hero p{font-size:14px}.hero-stats{grid-template-columns:1fr 1fr;gap:8px}.stat{padding:10px 12px}.stat strong{font-size:21px}.stat:last-child{grid-column:span 2}.notice{font-size:12px}.section-title{align-items:start}.section-title h2{font-size:21px}.recipes{grid-template-columns:1fr}.recipe h4{font-size:20px}.week-day{min-height:60px;padding:7px 2px}.week-day b{font-size:15px}.week-day small{font-size:10px}.week-day.active{padding:6px 1px}.weekly-wrap{padding:13px 10px}.shopping-list{grid-template-columns:1fr}.section-card{padding:17px}.recipe summary{padding:18px}.day-header{padding:15px}.navbtn{padding:9px 13px}}
 @media print{ @page{size:A4;margin:13mm} body{background:white;color:black;font-size:10pt}.shell{max-width:none;padding:0}.topbar,.nav,.week-grid,.weekly-wrap,.actionbar,.footer,.notice.print-hide,.print-hide{display:none!important}.hero{background:white;border:1px solid #bbb;border-radius:0;padding:10px 15px;margin-bottom:12px}.hero::after{display:none}.hero h1{font-size:22pt}.hero p{font-size:10pt}.hero-stats{display:flex;gap:8px;margin-top:8px}.stat{border:1px solid #ccc;padding:7px 12px}.stat strong{font-size:15pt}.section-title h2{font-size:16pt}.section-title{margin:12px 0}.view[hidden],.day-panel[hidden]{display:block!important}.recipes{display:block}.recipe{box-shadow:none;border:1px solid #ccc;border-radius:0;margin-bottom:8px;break-inside:avoid;page-break-inside:avoid}.recipe summary{padding:6px 10px}.recipe h4{margin:2px 0;font-size:13pt}.recipe-body{padding:7px 10px;display:block!important}.recipe-body h5{margin:3px 0}.ingredients{columns:2;margin:0 0 8px}.steps{margin-bottom:5px}.steps li{margin:2px 0}.tip{padding:6px}.day-header{border-bottom:2px solid #777;border-radius:0;padding:7px 0;margin:14px 0 8px;break-after:avoid}.day-note{padding:7px;margin:3px 0}.shop-group,.section-card{box-shadow:none;break-inside:avoid}.shop-item input{width:12px;height:12px}.detail-grid{display:block}.detail-grid .section-card{margin-bottom:8px}.shopping-list{display:grid;grid-template-columns:repeat(2,1fr)} }
 .quicktable{border-collapse:collapse;width:100%;min-width:650px;font-size:13px}.quicktable th,.quicktable td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left}.quicktable th{color:var(--green);white-space:nowrap}.quicktable td{color:var(--text)}
+
+/* Actual spending */
+.ledger-week{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.ledger-week strong{font-size:18px}.ledger-nav,.ledger-actions{display:flex;gap:7px;flex-wrap:wrap}
+.ledger-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0}.ledger-kpi{background:#f1f8f2;border:1px solid #e3ece4;border-radius:13px;padding:12px}
+.ledger-kpi small{display:block;font-size:11px;color:#66786b}.ledger-kpi strong{display:block;font-size:21px;color:var(--green)}.ledger-kpi.over{background:#fff0ee}.ledger-kpi.over strong{color:#b34137}
+.ledger-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ledger-form label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:13px}
+.ledger-form input,.ledger-form select{width:100%;min-width:0;min-height:44px;border-radius:10px;border:1px solid #cbd9ce;background:white;padding:9px 10px;color:var(--text);font-size:16px}
+.ledger-actions{grid-column:1/-1}.ledger-primary{background:var(--green);color:white;padding:11px 18px;border:0;border-radius:10px;font-weight:800}
+.ledger-message{color:var(--green);font-size:13px;font-weight:700;min-height:20px}.ledger-record{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin:9px 0}
+.ledger-record b{font-size:16px}.ledger-record small{display:block;color:var(--sub);font-size:12px}.ledger-record-amount{text-align:right;white-space:nowrap;font-weight:800;color:var(--green)}.ledger-record-amount div{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
+.ledger-record-amount button{background:white;border:1px solid var(--line);border-radius:8px;font-size:12px;padding:5px 9px}.ledger-empty{padding:26px;text-align:center;color:var(--sub);border:1px dashed #d1dfd3;border-radius:12px}
+.ledger-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 15px;font-size:13px}.ledger-category{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #edf2ed;padding:5px 0}
+.ledger-quick{margin:0 0 6px 28px;border:0;background:#e6f3eb;color:var(--green);border-radius:8px;padding:5px 11px;font-weight:800;font-size:12px}
+@media(max-width:750px){.ledger-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.ledger-form,.ledger-categories{grid-template-columns:1fr}.ledger-kpi strong{font-size:19px}}
+@media print{#view-ledger,.ledger-quick{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -28,7 +44,7 @@
  <div class="hero-stats"><div class="stat"><span>예상 장보기 금액</span><strong>78,300원</strong><small>예산 여유 1,700원</small></div><div class="stat"><span>1인 한 끼</span><strong>약 1,864원</strong><small>42인분으로 단순 배분</small></div><div class="stat"><span>식단 · 레시피</span><strong>7일 · 21개</strong><small>조리법·분량·시간 포함</small></div></div>
 </section>
 <div class="notice print-hide"><strong>예산 가정</strong> · 쌀 5kg 실구매비 포함 · 간장·된장·고추장·식용유·마늘·식초·소금 등 기본 양념은 보유 가정. 가격은 2026년 10월 말 전국 시세를 참고한 <strong>할인·실속 상품 목표가</strong>이며 실제 매장 가격에 따라 8만 원을 넘을 수 있습니다. 아기 이유식·분유는 제외합니다.</div>
-<nav class="nav" aria-label="페이지 메뉴" role="tablist"><button id="tab-recipes" class="navbtn" role="tab" aria-controls="view-recipes" aria-selected="true" type="button">🍽️ 7일 식단·조리법</button><button id="tab-shopping" class="navbtn" role="tab" aria-controls="view-shopping" aria-selected="false" type="button">🛒 장보기 목록</button><button id="tab-prep" class="navbtn" role="tab" aria-controls="view-prep" aria-selected="false" type="button">📦 보관·절약 팁</button></nav>
+<nav class="nav" aria-label="페이지 메뉴" role="tablist"><button id="tab-recipes" class="navbtn" role="tab" aria-controls="view-recipes" aria-selected="true" type="button">🍽️ 7일 식단·조리법</button><button id="tab-shopping" class="navbtn" role="tab" aria-controls="view-shopping" aria-selected="false" type="button">🛒 장보기 목록</button><button id="tab-ledger" class="navbtn" role="tab" aria-controls="view-ledger" aria-selected="false" type="button">💰 장보기 가계부</button><button id="tab-prep" class="navbtn" role="tab" aria-controls="view-prep" aria-selected="false" type="button">📦 보관·절약 팁</button></nav>
 <main>
  <section id="view-recipes" class="view" role="tabpanel" aria-labelledby="tab-recipes">
   <div class="section-title"><div><h2>요일별 식단과 레시피</h2><p>총 21끼 · 2인분 기준 · 카레와 닭찜은 4인분 조리 후 다음 끼니 활용</p></div></div>
@@ -42,6 +58,28 @@
   <div class="shopping-list" id="shopping-list"></div>
   <div class="section-card" style="margin-top:16px"><h3>집에 있다고 가정한 기본 양념 — 예산 미포함</h3><div class="pantry"><span>간장</span><span>된장</span><span>고추장</span><span>식용유</span><span>소금·후추</span><span>다진 마늘</span><span>식초</span><span>선택: 설탕·고춧가루·참기름</span></div><p>쌀 5kg가 이미 있다면 예상 새 구매액은 <b>60,300원</b>으로 내려갑니다. 이 경우에는 과일과 우유, 단백질 식품 보강에 예산을 쓰는 편이 좋습니다. <strong>쌀 5kg 18,000원, 달걀 30개 7,500원은 목표가</strong>라 실제 결제 전 반드시 가격을 확인하세요.</p></div>
  </section>
+
+ <section id="view-ledger" class="view" role="tabpanel" aria-labelledby="tab-ledger" hidden>
+ <div class="section-title"><div><h2>장보기 가계부</h2><p>실제 지출을 날짜별로 기록하고 주간 80,000원 예산을 관리합니다.</p></div></div>
+ <div class="section-card">
+ <div class="ledger-week"><strong id="ledgerWeek"></strong><div class="ledger-nav"><button type="button" class="smallbtn" id="ledgerPrev">← 이전 주</button><button type="button" class="smallbtn" id="ledgerCurrent">이번 주</button><button type="button" class="smallbtn" id="ledgerNext">다음 주 →</button></div></div>
+ <div class="ledger-kpis"><div class="ledger-kpi"><small>주간 예산</small><strong>80,000원</strong></div><div class="ledger-kpi"><small>기록된 실제 지출</small><strong id="ledgerSpent">0원</strong></div><div class="ledger-kpi" id="ledgerBalanceCard"><small>주간 남은 예산</small><strong id="ledgerBalance">80,000원</strong></div><div class="ledger-kpi"><small>이번 달 기록 지출</small><strong id="ledgerMonth">0원</strong></div></div>
+ <div class="progress-bg"><div id="ledgerProgress" class="progress-fg" style="width:0%"></div></div>
+ <p>식단의 예상 장보기 금액 78,300원과 구분하여 <strong>직접 입력한 실제 금액만</strong> 집계합니다. 기록이 없더라도 실제 지출이 없었다는 뜻은 아닙니다.</p><div id="ledgerCategories" class="ledger-categories"></div>
+ </div>
+ <div class="section-card" id="ledgerFormCard"><h3 id="ledgerFormTitle">✏️ 실제 구매 내역 기록</h3>
+ <form id="ledgerForm" class="ledger-form">
+ <label>구매 날짜<input type="date" id="ledgerDate" required></label>
+ <label>품목 이름<input type="text" id="ledgerItem" maxlength="80" required autocomplete="off" placeholder="예: 달걀 30개"></label>
+ <label>분류<select id="ledgerCategory"><option>주식·가공식품</option><option>단백질</option><option>채소</option><option>과일·유제품</option><option>양념·기타</option><option>간식·음료</option></select></label>
+ <label>실제 결제금액(원)<input type="number" id="ledgerAmount" min="1" max="99999999" step="1" inputmode="numeric" placeholder="영수증 금액" required></label>
+ <label>구매처 (선택)<input type="text" id="ledgerStore" maxlength="60" placeholder="예: 동네 마트"></label>
+ <label>수량·메모 (선택)<input type="text" id="ledgerMemo" maxlength="100" placeholder="예: 2팩, 할인품"></label>
+ <div class="ledger-actions"><button type="submit" class="ledger-primary" id="ledgerSave">+ 실제 지출 저장</button><button type="button" class="smallbtn" id="ledgerCancel" hidden>수정 취소</button></div>
+ </form><p id="ledgerMessage" class="ledger-message" role="status"></p></div>
+ <div class="section-card"><h3>🧾 선택한 주의 구매 내역 <span id="ledgerCount" class="fine"></span></h3><div id="ledgerRecords"></div></div>
+ <div class="section-card"><h3>💾 백업 · 복원</h3><div class="ledger-actions"><button type="button" class="smallbtn" id="ledgerCsv">CSV 내보내기</button><button type="button" class="smallbtn" id="ledgerJson">JSON 백업</button><button type="button" class="smallbtn" id="ledgerImport">JSON 복원</button><input type="file" id="ledgerFile" accept=".json,application/json" hidden></div><p>기록은 이 브라우저에만 저장되며 <strong>GitHub에 올라가지 않고 다른 기기로 자동 동기화되지 않습니다.</strong> 브라우저 데이터 삭제에 대비해 JSON 백업을 내려받으세요.</p></div>
+ </section>
  <section id="view-prep" class="view" role="tabpanel" aria-labelledby="tab-prep" hidden>
   <div class="section-title"><div><h2>보관과 절약 전략</h2><p>식재료를 버리지 않고 요리 시간을 줄이는 방법</p></div></div>
   <div class="detail-grid"><div class="section-card"><h3>🧺 장 본 날</h3><ol class="steps-small"><li>콩나물 500g은 월요일 맑은국에 200g, 수요일 비빔밥에 300g 사용합니다.</li><li>돼지고기 400g을 200g씩 소분하고 금요일 몫은 바로 냉동합니다.</li><li>고등어는 손질해 바로 냉장·냉동하고 화요일 저녁에 충분히 익힙니다.</li><li>닭고기는 수요일에 1kg 전부 조리할 예정이므로 구입 직후 바로 냉동하고 화요일 밤부터 냉장 해동합니다.</li></ol></div><div class="section-card"><h3>🍛 한 번 조리, 두 번 먹기</h3><ol class="steps-small"><li>월요일 저녁 돼지고기 카레 4인분 → 화요일 점심 2인분 남기기.</li><li>수요일 저녁 닭간장찜 4인분 → 목요일 점심 2인분 남기기.</li><li>밥은 한 끼 분량으로 빠르게 식혀 냉동해 두면 조리시간을 줄일 수 있습니다.</li><li>비빔국수와 잔치국수는 같은 소면이지만 소스를 달리해 반복감을 낮춥니다.</li></ol></div><div class="section-card"><h3>🍎 영양 보완 포인트</h3><ol class="steps-small"><li>달걀 약 28개, 두부 4모, 닭고기 1kg, 돼지고기 400g, 고등어 1손을 배분했습니다.</li><li>바나나·우유의 양은 충분하지 않을 수 있습니다. 쌀이 집에 있다면 남는 예산으로 과일·유제품부터 늘려주세요.</li><li>얼갈이·콩나물·무·오이·당근·애호박으로 채소 종류를 다양화했습니다.</li><li>식사량이 많은 날은 밥을 충분히 먹고, 남은 달걀 2개를 추가로 활용할 수 있습니다.</li></ol></div></div>
@@ -49,7 +87,7 @@
   <div class="section-card"><h3>📌 예산을 넘기게 된다면</h3><p>① 쌀·기본 양념·냉장고 재고를 먼저 차감 → ② 가격이 많이 오른 생선은 냉동 생선 할인품이나 두부 1~2모로 변경 → ③ 얼갈이·오이는 그 주 할인 채소로 바꿔 주세요. <strong>목표 장보기 78,300원은 1,700원밖에 남지 않는 빠듯한 예산</strong>이므로 실제 구매가격을 확인해야 합니다.</p><p>이 식단은 비용과 조리 편의를 우선한 기본안으로, 개인별 에너지·영양 필요량을 계산한 처방식은 아닙니다.</p></div>
  </section>
 </main>
-<footer class="footer">우리 집 알뜰 식탁 · 2인 7일 레시피 · 인터넷 연결 없이 열람 가능<br>장보기 보유 체크는 사용 중인 브라우저에만 저장됩니다.</footer>
+<footer class="footer">우리 집 알뜰 식탁 · 2인 7일 레시피 · 인터넷 연결 없이 열람 가능<br>장보기 체크와 실제 지출 내역은 이 브라우저에만 저장됩니다.</footer>
 </div>
 <script>
 'use strict';
@@ -83,13 +121,75 @@ try {owned=JSON.parse(localStorage.getItem('meal_80000_owned_v2')||'[]');if(!Arr
 function saveOwned(){try{localStorage.setItem('meal_80000_owned_v2',JSON.stringify(owned));}catch(e){/* Some local file browsers disable storage */}}
 function renderShopping(){
  const root=$('#shopping-list');root.innerHTML=shopping.map(g=>`<section class="shop-group"><h3>${g.group}<span>${formatter(g.items.reduce((s,x)=>s+x[1],0))}</span></h3>${g.items.map(([name,price])=>`<label class="shop-item"><input type="checkbox" data-product="${escapeHTML(name)}" ${owned.includes(name)?'checked':''}/><span class="itemname">${escapeHTML(name)}</span><span class="price">${formatter(price)}</span></label>`).join('')}</section>`).join('');
- $$('.shop-item input',root).forEach(el=>el.addEventListener('change',()=>{const name=el.dataset.product;owned=el.checked?[...new Set([...owned,name])]:owned.filter(x=>x!==name);saveOwned();updateTotals();}));updateTotals();
+ $$('.shop-item input',root).forEach(el=>el.addEventListener('change',()=>{const name=el.dataset.product;owned=el.checked?[...new Set([...owned,name])]:owned.filter(x=>x!==name);saveOwned();updateTotals();}));addLedgerQuickButtons();updateTotals();
 }
 function updateTotals(){const all=shopping.flatMap(g=>g.items);const required=all.reduce((s,[name,price])=>s+(owned.includes(name)?0:price),0);$('#requiredCost').textContent=formatter(required);$('#budgetLeft').textContent=formatter(BUDGET-required);$('#budgetLeft').style.color=required>BUDGET?'#b53b35':'#176c52';$('#costProgress').style.width=`${Math.min(100,required/BUDGET*100)}%`;$('#checkCount').textContent=`집에 있는 식재료 ${all.filter(([name])=>owned.includes(name)).length}/${all.length}개 체크 · 예상 구매액 ${formatter(required)}`;}
 function openAll(isOpen){expanded=isOpen;$$('.recipe').forEach(el=>el.open=isOpen);$('#expandBtn').textContent=isOpen?'조리법 모두 닫기':'조리법 모두 열기';}
 $$('.navbtn').forEach(el=>el.addEventListener('click',()=>setTab(el.id.replace('tab-',''))));
 $('#expandBtn').addEventListener('click',()=>{setTab('recipes');openAll(!expanded);});
 $('#resetBtn').addEventListener('click',()=>{owned=[];saveOwned();renderShopping();});
+
+const LEDGER_STORAGE='meal_real_expenses_v1';
+const ledgerCats=['주식·가공식품','단백질','채소','과일·유제품','양념·기타','간식·음료'];
+const dateISO=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+function parseLocalDay(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return null;const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2],12);return dateISO(d)===s?d:null;}
+function shiftDay(s,n){const d=parseLocalDay(s);d.setDate(d.getDate()+n);return dateISO(d);}
+function weekStart(s){const d=parseLocalDay(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return dateISO(d);}
+function normalizeExpense(r){if(!r||!parseLocalDay(r.date))return null;const cost=Number(r.cost),name=String(r.name||'').trim().slice(0,80);if(!name||!Number.isSafeInteger(cost)||cost<1||cost>99999999)return null;return {id:String(r.id||'').slice(0,80)||String(Date.now())+'_'+Math.random(),date:r.date,name:name,cost:cost,category:ledgerCats.includes(r.category)?r.category:'양념·기타',store:String(r.store||'').slice(0,60),memo:String(r.memo||'').slice(0,100)};}
+let expenses=[],selectedWeek=weekStart(dateISO(new Date())),editingExpense=null;
+try{const a=JSON.parse(localStorage.getItem(LEDGER_STORAGE)||'[]');if(Array.isArray(a))expenses=a.map(normalizeExpense).filter(Boolean);}catch(e){expenses=[];}
+function ledgerMsg(s){$('#ledgerMessage').textContent=s;}
+function storeExpenses(){try{localStorage.setItem(LEDGER_STORAGE,JSON.stringify(expenses));return true;}catch(e){ledgerMsg('⚠️ 브라우저 저장이 막혔습니다. JSON 백업을 내려받아 기록을 보관해 주세요.');return false;}}
+function clearExpenseForm(){editingExpense=null;$('#ledgerForm').reset();$('#ledgerDate').value=dateISO(new Date());$('#ledgerSave').textContent='+ 실제 지출 저장';$('#ledgerFormTitle').textContent='✏️ 실제 구매 내역 기록';$('#ledgerCancel').hidden=true;}
+function renderExpenses(){
+ const end=shiftDay(selectedWeek,6),list=expenses.filter(e=>e.date>=selectedWeek&&e.date<=end),spent=list.reduce((s,e)=>s+e.cost,0),balance=BUDGET-spent,month=dateISO(new Date()).slice(0,7);
+ $('#ledgerWeek').textContent=selectedWeek.replace(/-/g,'.')+' ~ '+end.replace(/-/g,'.');
+ $('#ledgerSpent').textContent=formatter(spent);$('#ledgerBalance').textContent=(balance<0?'-':'')+formatter(Math.abs(balance));
+ $('#ledgerBalanceCard').classList.toggle('over',balance<0);$('#ledgerMonth').textContent=formatter(expenses.filter(e=>e.date.startsWith(month)).reduce((s,e)=>s+e.cost,0));
+ $('#ledgerProgress').style.width=Math.min(100,spent/BUDGET*100)+'%';$('#ledgerProgress').style.background=balance<0?'#b34137':'#176c52';
+ $('#ledgerCount').textContent='· '+list.length+'건';
+ const groups=ledgerCats.map(c=>({name:c,cost:list.filter(e=>e.category===c).reduce((s,e)=>s+e.cost,0)})).filter(c=>c.cost>0);
+ $('#ledgerCategories').innerHTML=groups.map(g=>'<div class="ledger-category"><span>'+escapeHTML(g.name)+'</span><strong>'+formatter(g.cost)+'</strong></div>').join('');
+ const sorted=list.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+ $('#ledgerRecords').innerHTML=sorted.length?sorted.map(e=>'<div class="ledger-record"><div><b>'+escapeHTML(e.name)+'</b><small>'+e.date.replace(/-/g,'.')+' · '+escapeHTML(e.category)+(e.store?' · '+escapeHTML(e.store):'')+(e.memo?' · '+escapeHTML(e.memo):'')+'</small></div><div class="ledger-record-amount">'+formatter(e.cost)+'<div><button type="button" data-edit="'+escapeHTML(e.id)+'">수정</button><button type="button" data-del="'+escapeHTML(e.id)+'">삭제</button></div></div></div>').join(''):'<div class="ledger-empty">이 주에 입력된 지출이 없습니다.<br>영수증의 실제 금액을 기록해 주세요.</div>';
+}
+function addLedgerQuickButtons(){
+ $$('.shop-group').forEach((group,i)=>$$('.shop-item',group).forEach(label=>{
+  const name=label.querySelector('input').dataset.product,b=document.createElement('button');b.type='button';b.className='ledger-quick';b.textContent='+ 실제 지출';
+  b.addEventListener('click',()=>{setTab('ledger');clearExpenseForm();$('#ledgerItem').value=name;$('#ledgerCategory').value=ledgerCats.includes(shopping[i].group)?shopping[i].group:'양념·기타';selectedWeek=weekStart(dateISO(new Date()));renderExpenses();ledgerMsg('품목을 가져왔습니다. 실제 구매 금액을 입력하세요.');$('#ledgerFormCard').scrollIntoView({block:'start',behavior:'smooth'});$('#ledgerAmount').focus({preventScroll:true});});label.insertAdjacentElement('afterend',b);
+ }));
+}
+$('#ledgerPrev').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,-7);renderExpenses();});
+$('#ledgerNext').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,7);renderExpenses();});
+$('#ledgerCurrent').addEventListener('click',()=>{selectedWeek=weekStart(dateISO(new Date()));renderExpenses();});
+$('#ledgerCancel').addEventListener('click',()=>{clearExpenseForm();ledgerMsg('수정을 취소했습니다.');});
+$('#ledgerForm').addEventListener('submit',ev=>{
+ ev.preventDefault();const r=normalizeExpense({date:$('#ledgerDate').value,name:$('#ledgerItem').value,cost:$('#ledgerAmount').value,category:$('#ledgerCategory').value,store:$('#ledgerStore').value,memo:$('#ledgerMemo').value});
+ if(!r){ledgerMsg('구매일, 품목명, 1원 이상의 실제 금액을 확인해 주세요.');return;}
+ const updating=editingExpense!==null;r.id=editingExpense||(String(Date.now())+'_'+Math.random().toString(36).slice(2));
+ expenses=updating?expenses.map(e=>e.id===editingExpense?r:e):[...expenses,r];
+ const ok=storeExpenses();selectedWeek=weekStart(r.date);clearExpenseForm();renderExpenses();if(ok)ledgerMsg(updating?'구매 내역을 수정했습니다.':'실제 결제금액을 저장했습니다.');
+});
+$('#ledgerRecords').addEventListener('click',ev=>{
+ const btn=ev.target.closest('button[data-edit],button[data-del]');if(!btn)return;
+ const id=btn.dataset.edit||btn.dataset.del,r=expenses.find(e=>e.id===id);if(!r)return;
+ if(btn.dataset.del){if(!confirm('“'+r.name+'” '+formatter(r.cost)+' 기록을 삭제할까요?'))return;expenses=expenses.filter(e=>e.id!==id);const ok=storeExpenses();if(editingExpense===id)clearExpenseForm();renderExpenses();if(ok)ledgerMsg('기록을 삭제했습니다.');return;}
+ editingExpense=id;$('#ledgerDate').value=r.date;$('#ledgerItem').value=r.name;$('#ledgerCategory').value=r.category;$('#ledgerAmount').value=r.cost;$('#ledgerStore').value=r.store;$('#ledgerMemo').value=r.memo;$('#ledgerSave').textContent='수정 내용 저장';$('#ledgerFormTitle').textContent='✏️ 구매 기록 수정';$('#ledgerCancel').hidden=false;$('#ledgerFormCard').scrollIntoView({block:'start',behavior:'smooth'});
+});
+function downloadExpense(name,content,type){const url=URL.createObjectURL(new Blob([content],{type:type})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function csvSafe(x){let s=String(x===undefined?'':x);if(/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+$('#ledgerCsv').addEventListener('click',()=>{const rows=[['날짜','품목','분류','실제금액(원)','구매처','수량·메모'],...expenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>[e.date,e.name,e.category,e.cost,e.store,e.memo])];downloadExpense('Meal_장보기지출_'+dateISO(new Date())+'.csv','\uFEFF'+rows.map(r=>r.map(csvSafe).join(',')).join('\r\n'),'text/csv;charset=utf-8');ledgerMsg('전체 내역을 CSV로 내려받았습니다.');});
+$('#ledgerJson').addEventListener('click',()=>{downloadExpense('Meal_지출백업_'+dateISO(new Date())+'.json',JSON.stringify({app:'Meal-expenses',version:1,records:expenses},null,2),'application/json');ledgerMsg('전체 내역을 JSON으로 백업했습니다.');});
+$('#ledgerImport').addEventListener('click',()=>$('#ledgerFile').click());
+$('#ledgerFile').addEventListener('change',async ev=>{
+ const file=ev.target.files&&ev.target.files[0];if(!file)return;
+ try{if(file.size>5000000)throw Error('최대 5MB까지 복원할 수 있습니다.');const data=JSON.parse(await file.text());if(data.app!=='Meal-expenses'||data.version!==1||!Array.isArray(data.records)||data.records.length>10000)throw Error('Meal 가계부 백업 형식이 아닙니다.');
+ const rows=data.records.map(normalizeExpense);if(rows.some(r=>!r))throw Error('유효하지 않은 기록이 있습니다.');
+ if(!confirm('기존 '+expenses.length+'건의 기록을 백업 파일 '+rows.length+'건으로 교체할까요?'))return;expenses=rows;const ok=storeExpenses();clearExpenseForm();selectedWeek=weekStart(dateISO(new Date()));renderExpenses();if(ok)ledgerMsg(rows.length+'건의 기록을 복원했습니다.');
+ }catch(e){ledgerMsg('복원 실패: '+e.message);}finally{ev.target.value='';}
+});
+clearExpenseForm();renderExpenses();
+
 let printState=null;
 function preparePrint(){if(printState)return;printState={tab:$('.navbtn[aria-selected=true]').id.replace('tab-',''),open:$$('.recipe').map(el=>el.open)};$$('.recipe').forEach(el=>el.open=true);}
 function finishPrint(){if(!printState)return;$$('.recipe').forEach((el,i)=>el.open=printState.open[i]||false);printState=null;}

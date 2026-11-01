@@ -197,6 +197,65 @@ function renderDays(){
 function selectDay(day){selectedDay=day;$$('.day-panel').forEach(el=>el.hidden=el.dataset.panel!==day);$$('.week-day').forEach(el=>{const active=el.dataset.day===day;el.classList.toggle('active',active);el.setAttribute('aria-pressed',String(active));});}
 function setTab(name){$$('.navbtn').forEach(el=>el.setAttribute('aria-selected',String(el.id===`tab-${name}`)));$$('.view').forEach(el=>el.hidden=el.id!==`view-${name}`);}
 
+function openAll(isOpen){expanded=isOpen;$$('.recipe').forEach(el=>el.open=isOpen);$('#expandBtn').textContent=isOpen?'조리법 모두 닫기':'조리법 모두 열기';}
+$$('.navbtn').forEach(el=>el.addEventListener('click',()=>setTab(el.id.replace('tab-',''))));
+$('#expandBtn').addEventListener('click',()=>{setTab('recipes');openAll(!expanded);});
+
+const LEDGER_STORAGE='meal_real_expenses_v1';
+const ledgerCats=['주식·가공식품','단백질','채소','과일·유제품','양념·기타','간식·음료'];
+const dateISO=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+function parseLocalDay(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return null;const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2],12);return dateISO(d)===s?d:null;}
+function shiftDay(s,n){const d=parseLocalDay(s);d.setDate(d.getDate()+n);return dateISO(d);}
+function weekStart(s){const d=parseLocalDay(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return dateISO(d);}
+function normalizeExpense(r){if(!r||!parseLocalDay(r.date))return null;const cost=Number(r.cost),name=String(r.name||'').trim().slice(0,80);if(!name||!Number.isSafeInteger(cost)||cost<1||cost>99999999)return null;return {id:String(r.id||'').slice(0,80)||String(Date.now())+'_'+Math.random(),date:r.date,name:name,cost:cost,category:ledgerCats.includes(r.category)?r.category:'양념·기타',store:String(r.store||'').slice(0,60),memo:String(r.memo||'').slice(0,100),planWeek:parseLocalDay(r.planWeek)?r.planWeek:'',planKey:String(r.planKey||'').slice(0,90)};}
+let expenses=[],selectedWeek=weekStart(dateISO(new Date())),editingExpense=null;
+try{const a=JSON.parse(localStorage.getItem(LEDGER_STORAGE)||'[]');if(Array.isArray(a))expenses=a.map(normalizeExpense).filter(Boolean);}catch(e){expenses=[];}
+function ledgerMsg(s){$('#ledgerMessage').textContent=s;}
+function storeExpenses(){try{localStorage.setItem(LEDGER_STORAGE,JSON.stringify(expenses));return true;}catch(e){ledgerMsg('⚠️ 브라우저 저장이 막혔습니다. JSON 백업을 내려받아 기록을 보관해 주세요.');return false;}}
+function clearExpenseForm(){editingExpense=null;$('#ledgerForm').reset();$('#ledgerDate').value=dateISO(new Date());$('#ledgerSave').textContent='+ 실제 지출 저장';$('#ledgerFormTitle').textContent='✏️ 실제 구매 내역 기록';$('#ledgerCancel').hidden=true;}
+function renderExpenses(){
+ const end=shiftDay(selectedWeek,6),list=expenses.filter(e=>e.date>=selectedWeek&&e.date<=end),spent=list.reduce((s,e)=>s+e.cost,0),balance=BUDGET-spent,month=dateISO(new Date()).slice(0,7);
+ $('#ledgerWeek').textContent=selectedWeek.replace(/-/g,'.')+' ~ '+end.replace(/-/g,'.');
+ $('#ledgerSpent').textContent=formatter(spent);$('#ledgerBalance').textContent=(balance<0?'-':'')+formatter(Math.abs(balance));
+ $('#ledgerBalanceCard').classList.toggle('over',balance<0);$('#ledgerMonth').textContent=formatter(expenses.filter(e=>e.date.startsWith(month)).reduce((s,e)=>s+e.cost,0));
+ $('#ledgerProgress').style.width=Math.min(100,spent/BUDGET*100)+'%';$('#ledgerProgress').style.background=balance<0?'#b34137':'#176c52';
+ $('#ledgerCount').textContent='· '+list.length+'건';
+ const groups=ledgerCats.map(c=>({name:c,cost:list.filter(e=>e.category===c).reduce((s,e)=>s+e.cost,0)})).filter(c=>c.cost>0);
+ $('#ledgerCategories').innerHTML=groups.map(g=>'<div class="ledger-category"><span>'+escapeHTML(g.name)+'</span><strong>'+formatter(g.cost)+'</strong></div>').join('');
+ const sorted=list.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+ $('#ledgerRecords').innerHTML=sorted.length?sorted.map(e=>'<div class="ledger-record"><div><b>'+escapeHTML(e.name)+'</b><small>'+e.date.replace(/-/g,'.')+' · '+escapeHTML(e.category)+(e.store?' · '+escapeHTML(e.store):'')+(e.memo?' · '+escapeHTML(e.memo):'')+'</small></div><div class="ledger-record-amount">'+formatter(e.cost)+'<div><button type="button" data-edit="'+escapeHTML(e.id)+'">수정</button><button type="button" data-del="'+escapeHTML(e.id)+'">삭제</button></div></div></div>').join(''):'<div class="ledger-empty">이 주에 입력된 지출이 없습니다.<br>영수증의 실제 금액을 기록해 주세요.</div>';
+}
+$('#ledgerPrev').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,-7);renderExpenses();});
+$('#ledgerNext').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,7);renderExpenses();});
+$('#ledgerCurrent').addEventListener('click',()=>{selectedWeek=weekStart(dateISO(new Date()));renderExpenses();});
+$('#ledgerCancel').addEventListener('click',()=>{clearExpenseForm();ledgerMsg('수정을 취소했습니다.');});
+$('#ledgerForm').addEventListener('submit',ev=>{
+ ev.preventDefault();const r=normalizeExpense({date:$('#ledgerDate').value,name:$('#ledgerItem').value,cost:$('#ledgerAmount').value,category:$('#ledgerCategory').value,store:$('#ledgerStore').value,memo:$('#ledgerMemo').value});
+ if(!r){ledgerMsg('구매일, 품목명, 1원 이상의 실제 금액을 확인해 주세요.');return;}
+ const updating=editingExpense!==null;const prior=updating?expenses.find(x=>x.id===editingExpense):null;if(prior){r.planWeek=prior.planWeek;r.planKey=prior.planKey;}r.id=editingExpense||(String(Date.now())+'_'+Math.random().toString(36).slice(2));
+ expenses=updating?expenses.map(e=>e.id===editingExpense?r:e):[...expenses,r];
+ const ok=storeExpenses();selectedWeek=weekStart(r.date);clearExpenseForm();renderExpenses();renderShopping();if(ok)ledgerMsg(updating?'구매 내역을 수정했습니다.':'실제 결제금액을 저장했습니다.');
+});
+$('#ledgerRecords').addEventListener('click',ev=>{
+ const btn=ev.target.closest('button[data-edit],button[data-del]');if(!btn)return;
+ const id=btn.dataset.edit||btn.dataset.del,r=expenses.find(e=>e.id===id);if(!r)return;
+ if(btn.dataset.del){if(!confirm('“'+r.name+'” '+formatter(r.cost)+' 기록을 삭제할까요?'))return;expenses=expenses.filter(e=>e.id!==id);const ok=storeExpenses();if(editingExpense===id)clearExpenseForm();renderExpenses();renderShopping();if(ok)ledgerMsg('기록을 삭제했습니다.');return;}
+ editingExpense=id;$('#ledgerDate').value=r.date;$('#ledgerItem').value=r.name;$('#ledgerCategory').value=r.category;$('#ledgerAmount').value=r.cost;$('#ledgerStore').value=r.store;$('#ledgerMemo').value=r.memo;$('#ledgerSave').textContent='수정 내용 저장';$('#ledgerFormTitle').textContent='✏️ 구매 기록 수정';$('#ledgerCancel').hidden=false;$('#ledgerFormCard').scrollIntoView({block:'start',behavior:'smooth'});
+});
+function downloadExpense(name,content,type){const url=URL.createObjectURL(new Blob([content],{type:type})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function csvSafe(x){let s=String(x===undefined?'':x);if(/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
+$('#ledgerCsv').addEventListener('click',()=>{const rows=[['날짜','품목','분류','실제금액(원)','구매처','수량·메모'],...expenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>[e.date,e.name,e.category,e.cost,e.store,e.memo])];downloadExpense('Meal_장보기지출_'+dateISO(new Date())+'.csv','\uFEFF'+rows.map(r=>r.map(csvSafe).join(',')).join('\r\n'),'text/csv;charset=utf-8');ledgerMsg('전체 내역을 CSV로 내려받았습니다.');});
+$('#ledgerJson').addEventListener('click',()=>{downloadExpense('Meal_지출백업_'+dateISO(new Date())+'.json',JSON.stringify({app:'Meal-expenses',version:1,records:expenses},null,2),'application/json');ledgerMsg('전체 내역을 JSON으로 백업했습니다.');});
+$('#ledgerImport').addEventListener('click',()=>$('#ledgerFile').click());
+$('#ledgerFile').addEventListener('change',async ev=>{
+ const file=ev.target.files&&ev.target.files[0];if(!file)return;
+ try{if(file.size>5000000)throw Error('최대 5MB까지 복원할 수 있습니다.');const data=JSON.parse(await file.text());if(data.app!=='Meal-expenses'||data.version!==1||!Array.isArray(data.records)||data.records.length>10000)throw Error('Meal 가계부 백업 형식이 아닙니다.');
+ const rows=data.records.map(normalizeExpense);if(rows.some(r=>!r))throw Error('유효하지 않은 기록이 있습니다.');
+ if(!confirm('기존 '+expenses.length+'건의 기록을 백업 파일 '+rows.length+'건으로 교체할까요?'))return;expenses=rows;const ok=storeExpenses();clearExpenseForm();selectedWeek=weekStart(dateISO(new Date()));renderExpenses();renderShopping();if(ok)ledgerMsg(rows.length+'건의 기록을 복원했습니다.');
+ }catch(e){ledgerMsg('복원 실패: '+e.message);}finally{ev.target.value='';}
+});
+clearExpenseForm();renderExpenses();
+
 const SHOP_KEY='meal_shopping_flow_v1';
 let plans={};
 try{const p=JSON.parse(localStorage.getItem(SHOP_KEY)||'{}');if(p&&typeof p==='object'&&!Array.isArray(p))plans=p;}catch(e){}
@@ -311,64 +370,6 @@ $('#shopFinish').addEventListener('click',()=>{
 $('#shopReopen').addEventListener('click',()=>{getPlan().closed=false;savePlan();renderShopping();shopMessage('정산을 다시 열었습니다.');});
 $('#shopOpenLedger').addEventListener('click',()=>{selectedWeek=shopWeek;renderExpenses();setTab('ledger');});
 resetShopDate();
-function openAll(isOpen){expanded=isOpen;$$('.recipe').forEach(el=>el.open=isOpen);$('#expandBtn').textContent=isOpen?'조리법 모두 닫기':'조리법 모두 열기';}
-$$('.navbtn').forEach(el=>el.addEventListener('click',()=>setTab(el.id.replace('tab-',''))));
-$('#expandBtn').addEventListener('click',()=>{setTab('recipes');openAll(!expanded);});
-
-const LEDGER_STORAGE='meal_real_expenses_v1';
-const ledgerCats=['주식·가공식품','단백질','채소','과일·유제품','양념·기타','간식·음료'];
-const dateISO=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
-function parseLocalDay(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return null;const a=s.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2],12);return dateISO(d)===s?d:null;}
-function shiftDay(s,n){const d=parseLocalDay(s);d.setDate(d.getDate()+n);return dateISO(d);}
-function weekStart(s){const d=parseLocalDay(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return dateISO(d);}
-function normalizeExpense(r){if(!r||!parseLocalDay(r.date))return null;const cost=Number(r.cost),name=String(r.name||'').trim().slice(0,80);if(!name||!Number.isSafeInteger(cost)||cost<1||cost>99999999)return null;return {id:String(r.id||'').slice(0,80)||String(Date.now())+'_'+Math.random(),date:r.date,name:name,cost:cost,category:ledgerCats.includes(r.category)?r.category:'양념·기타',store:String(r.store||'').slice(0,60),memo:String(r.memo||'').slice(0,100),planWeek:parseLocalDay(r.planWeek)?r.planWeek:'',planKey:String(r.planKey||'').slice(0,90)};}
-let expenses=[],selectedWeek=weekStart(dateISO(new Date())),editingExpense=null;
-try{const a=JSON.parse(localStorage.getItem(LEDGER_STORAGE)||'[]');if(Array.isArray(a))expenses=a.map(normalizeExpense).filter(Boolean);}catch(e){expenses=[];}
-function ledgerMsg(s){$('#ledgerMessage').textContent=s;}
-function storeExpenses(){try{localStorage.setItem(LEDGER_STORAGE,JSON.stringify(expenses));return true;}catch(e){ledgerMsg('⚠️ 브라우저 저장이 막혔습니다. JSON 백업을 내려받아 기록을 보관해 주세요.');return false;}}
-function clearExpenseForm(){editingExpense=null;$('#ledgerForm').reset();$('#ledgerDate').value=dateISO(new Date());$('#ledgerSave').textContent='+ 실제 지출 저장';$('#ledgerFormTitle').textContent='✏️ 실제 구매 내역 기록';$('#ledgerCancel').hidden=true;}
-function renderExpenses(){
- const end=shiftDay(selectedWeek,6),list=expenses.filter(e=>e.date>=selectedWeek&&e.date<=end),spent=list.reduce((s,e)=>s+e.cost,0),balance=BUDGET-spent,month=dateISO(new Date()).slice(0,7);
- $('#ledgerWeek').textContent=selectedWeek.replace(/-/g,'.')+' ~ '+end.replace(/-/g,'.');
- $('#ledgerSpent').textContent=formatter(spent);$('#ledgerBalance').textContent=(balance<0?'-':'')+formatter(Math.abs(balance));
- $('#ledgerBalanceCard').classList.toggle('over',balance<0);$('#ledgerMonth').textContent=formatter(expenses.filter(e=>e.date.startsWith(month)).reduce((s,e)=>s+e.cost,0));
- $('#ledgerProgress').style.width=Math.min(100,spent/BUDGET*100)+'%';$('#ledgerProgress').style.background=balance<0?'#b34137':'#176c52';
- $('#ledgerCount').textContent='· '+list.length+'건';
- const groups=ledgerCats.map(c=>({name:c,cost:list.filter(e=>e.category===c).reduce((s,e)=>s+e.cost,0)})).filter(c=>c.cost>0);
- $('#ledgerCategories').innerHTML=groups.map(g=>'<div class="ledger-category"><span>'+escapeHTML(g.name)+'</span><strong>'+formatter(g.cost)+'</strong></div>').join('');
- const sorted=list.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
- $('#ledgerRecords').innerHTML=sorted.length?sorted.map(e=>'<div class="ledger-record"><div><b>'+escapeHTML(e.name)+'</b><small>'+e.date.replace(/-/g,'.')+' · '+escapeHTML(e.category)+(e.store?' · '+escapeHTML(e.store):'')+(e.memo?' · '+escapeHTML(e.memo):'')+'</small></div><div class="ledger-record-amount">'+formatter(e.cost)+'<div><button type="button" data-edit="'+escapeHTML(e.id)+'">수정</button><button type="button" data-del="'+escapeHTML(e.id)+'">삭제</button></div></div></div>').join(''):'<div class="ledger-empty">이 주에 입력된 지출이 없습니다.<br>영수증의 실제 금액을 기록해 주세요.</div>';
-}
-$('#ledgerPrev').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,-7);renderExpenses();});
-$('#ledgerNext').addEventListener('click',()=>{selectedWeek=shiftDay(selectedWeek,7);renderExpenses();});
-$('#ledgerCurrent').addEventListener('click',()=>{selectedWeek=weekStart(dateISO(new Date()));renderExpenses();});
-$('#ledgerCancel').addEventListener('click',()=>{clearExpenseForm();ledgerMsg('수정을 취소했습니다.');});
-$('#ledgerForm').addEventListener('submit',ev=>{
- ev.preventDefault();const r=normalizeExpense({date:$('#ledgerDate').value,name:$('#ledgerItem').value,cost:$('#ledgerAmount').value,category:$('#ledgerCategory').value,store:$('#ledgerStore').value,memo:$('#ledgerMemo').value});
- if(!r){ledgerMsg('구매일, 품목명, 1원 이상의 실제 금액을 확인해 주세요.');return;}
- const updating=editingExpense!==null;const prior=updating?expenses.find(x=>x.id===editingExpense):null;if(prior){r.planWeek=prior.planWeek;r.planKey=prior.planKey;}r.id=editingExpense||(String(Date.now())+'_'+Math.random().toString(36).slice(2));
- expenses=updating?expenses.map(e=>e.id===editingExpense?r:e):[...expenses,r];
- const ok=storeExpenses();selectedWeek=weekStart(r.date);clearExpenseForm();renderExpenses();renderShopping();if(ok)ledgerMsg(updating?'구매 내역을 수정했습니다.':'실제 결제금액을 저장했습니다.');
-});
-$('#ledgerRecords').addEventListener('click',ev=>{
- const btn=ev.target.closest('button[data-edit],button[data-del]');if(!btn)return;
- const id=btn.dataset.edit||btn.dataset.del,r=expenses.find(e=>e.id===id);if(!r)return;
- if(btn.dataset.del){if(!confirm('“'+r.name+'” '+formatter(r.cost)+' 기록을 삭제할까요?'))return;expenses=expenses.filter(e=>e.id!==id);const ok=storeExpenses();if(editingExpense===id)clearExpenseForm();renderExpenses();renderShopping();if(ok)ledgerMsg('기록을 삭제했습니다.');return;}
- editingExpense=id;$('#ledgerDate').value=r.date;$('#ledgerItem').value=r.name;$('#ledgerCategory').value=r.category;$('#ledgerAmount').value=r.cost;$('#ledgerStore').value=r.store;$('#ledgerMemo').value=r.memo;$('#ledgerSave').textContent='수정 내용 저장';$('#ledgerFormTitle').textContent='✏️ 구매 기록 수정';$('#ledgerCancel').hidden=false;$('#ledgerFormCard').scrollIntoView({block:'start',behavior:'smooth'});
-});
-function downloadExpense(name,content,type){const url=URL.createObjectURL(new Blob([content],{type:type})),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-function csvSafe(x){let s=String(x===undefined?'':x);if(/^\s*[=+@-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
-$('#ledgerCsv').addEventListener('click',()=>{const rows=[['날짜','품목','분류','실제금액(원)','구매처','수량·메모'],...expenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>[e.date,e.name,e.category,e.cost,e.store,e.memo])];downloadExpense('Meal_장보기지출_'+dateISO(new Date())+'.csv','\uFEFF'+rows.map(r=>r.map(csvSafe).join(',')).join('\r\n'),'text/csv;charset=utf-8');ledgerMsg('전체 내역을 CSV로 내려받았습니다.');});
-$('#ledgerJson').addEventListener('click',()=>{downloadExpense('Meal_지출백업_'+dateISO(new Date())+'.json',JSON.stringify({app:'Meal-expenses',version:1,records:expenses},null,2),'application/json');ledgerMsg('전체 내역을 JSON으로 백업했습니다.');});
-$('#ledgerImport').addEventListener('click',()=>$('#ledgerFile').click());
-$('#ledgerFile').addEventListener('change',async ev=>{
- const file=ev.target.files&&ev.target.files[0];if(!file)return;
- try{if(file.size>5000000)throw Error('최대 5MB까지 복원할 수 있습니다.');const data=JSON.parse(await file.text());if(data.app!=='Meal-expenses'||data.version!==1||!Array.isArray(data.records)||data.records.length>10000)throw Error('Meal 가계부 백업 형식이 아닙니다.');
- const rows=data.records.map(normalizeExpense);if(rows.some(r=>!r))throw Error('유효하지 않은 기록이 있습니다.');
- if(!confirm('기존 '+expenses.length+'건의 기록을 백업 파일 '+rows.length+'건으로 교체할까요?'))return;expenses=rows;const ok=storeExpenses();clearExpenseForm();selectedWeek=weekStart(dateISO(new Date()));renderExpenses();renderShopping();if(ok)ledgerMsg(rows.length+'건의 기록을 복원했습니다.');
- }catch(e){ledgerMsg('복원 실패: '+e.message);}finally{ev.target.value='';}
-});
-clearExpenseForm();renderExpenses();
 
 let printState=null;
 function preparePrint(){if(printState)return;printState={tab:$('.navbtn[aria-selected=true]').id.replace('tab-',''),open:$$('.recipe').map(el=>el.open)};$$('.recipe').forEach(el=>el.open=true);}

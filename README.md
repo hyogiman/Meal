@@ -5,6 +5,14 @@
 - **앱 주소:** https://hyogiman.github.io/Meal/ (GitHub Pages 활성화 시)
 - **소스:** [index.html](./index.html)
 
+## 🆕 Meal 2.0 — Firebase 재고 관리 베타
+
+- **바로 열기:** https://hyogiman.github.io/Meal/v2/
+- **최초 Firebase 설정 안내:** [v2/README.md](./v2/README.md)
+- 기존 식단표는 이 주소에서 그대로 유지되며, 새 버전은 재고·구매·예산·식단을 함께 관리합니다.
+- Google 로그인과 Firestore 저장을 쓰려면 Firebase 콘솔에서 Google 인증·허용 도메인 및 Firestore 보안 규칙을 활성화해야 합니다.
+- 사진 인식·OpenAI API 기능은 아직 연결되지 않았습니다.
+
 ## 2026-11-01 기준 구성
 
 사용자가 제공한 쿠팡 로켓프레시 장바구니 캡처에 선택된 **14개 상품의 표시가격 합계는 66,420원**입니다. 80,000원 대비 13,580원 차액이 있습니다. **아직 결제된 금액이 아닙니다.** 배송지, 회원, 쿠폰 조건, 실제 구매 시점에 따라 결제가가 달라질 수 있습니다.

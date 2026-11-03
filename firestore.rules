@@ -1,41 +1,74 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function owner(userId) {
-      return request.auth != null && request.auth.uid == userId;
+    function isOwner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function hasName() {
+      return request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100;
     }
-    match /users/{userId}/inventory/{itemId} {
-      allow read: if owner(userId);
-      allow create, update: if owner(userId)
-        && request.resource.data.id == itemId;
-      allow delete: if owner(userId);
+    function validQty() {
+      return request.resource.data.qty is number
+        && request.resource.data.qty >= 0
+        && request.resource.data.qty <= 100000;
     }
-    match /users/{userId}/cart/{itemId} {
-      allow read: if owner(userId);
-      allow create, update: if owner(userId)
-        && request.resource.data.id == itemId;
-      allow delete: if owner(userId);
+    function validBudget() {
+      return request.resource.data.budget is number
+        && request.resource.data.budget >= 10000
+        && request.resource.data.budget <= 10000000;
     }
-    match /users/{userId}/purchases/{itemId} {
-      allow read: if owner(userId);
-      allow create, update: if owner(userId)
-        && request.resource.data.id == itemId;
-      allow delete: if owner(userId);
-    }
-    match /users/{userId}/settings/{settingsId} {
-      allow read: if owner(userId);
-      allow create, update: if owner(userId)
-        && request.resource.data.id == settingsId;
-      allow delete: if owner(userId);
-    }
-    match /users/{userId}/plans/{weekId} {
-      allow read: if owner(userId);
-      allow create, update: if owner(userId)
-        && request.resource.data.id == weekId;
-      allow delete: if owner(userId);
-    }
-    match /{path=**} {
+    match /users/{uid} {
       allow read, write: if false;
+      match /inventory/{doc} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && hasName() && validQty();
+        allow delete: if isOwner(uid);
+      }
+      match /purchases/{doc} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && hasName() && validQty()
+          && request.resource.data.cost is number
+          && request.resource.data.cost >= 1
+          && request.resource.data.cost <= 99999999;
+        allow delete: if isOwner(uid);
+      }
+      match /wishlist/{doc} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && hasName() && validQty();
+        allow delete: if isOwner(uid);
+      }
+      match /plans/{doc} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.days is list
+          && request.resource.data.days.size() == 7
+          && request.resource.data.servings is number
+          && request.resource.data.servings >= 1
+          && request.resource.data.servings <= 6;
+        allow delete: if isOwner(uid);
+      }
+      match /settings/{doc} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validBudget();
+        allow delete: if isOwner(uid);
+      }
+      match /events/{doc} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && request.resource.data.kind is string
+          && request.resource.data.name is string;
+        allow update, delete: if isOwner(uid);
+      }
+      // Preserve /v2/ legacy cart access. Do not broaden to other collections.
+      match /cart/{doc} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.id == doc;
+        allow delete: if isOwner(uid);
+      }
+      // Server Admin SDK can access this path. Client must not change AI quotas.
+      match /usage/{doc} { allow read, write: if false; }
     }
+    match /{document=**} { allow read, write: if false; }
   }
 }

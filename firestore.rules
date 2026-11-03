@@ -22,6 +22,12 @@ service cloud.firestore {
         && request.resource.data.id == itemId;
       allow delete: if owner(userId);
     }
+    match /users/{userId}/settings/{settingsId} {
+      allow read: if owner(userId);
+      allow create, update: if owner(userId)
+        && request.resource.data.id == settingsId;
+      allow delete: if owner(userId);
+    }
     match /users/{userId}/plans/{weekId} {
       allow read: if owner(userId);
       allow create, update: if owner(userId)

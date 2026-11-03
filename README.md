@@ -51,3 +51,11 @@
 Firebase 웹 설정 키는 공식 문서에서 설명하는 **공개 앱 설정값**입니다. **OpenAI API 비밀키나 Firebase 서비스 계정 키를 웹 파일/공개 GitHub에 올리지 마세요.** Firestore Rules를 통해 로그인한 본인 UID의 문서만 접근하도록 해야 합니다.
 
 기기 모드의 데이터는 Firebase로 자동 이전되지 않습니다. 필요하면 설정의 JSON 백업/복원 기능을 사용하세요. 다른 가족 계정끼리 공용 재고 공유 기능은 아직 구현 전입니다.
+
+## Codex와 Firebase 배포 준비 현황 (2026-11-03)
+
+- **GitHub에 백엔드 배포용 파일 준비 완료:** `functions/index.js`, `functions/package.json`, `storage.rules`, `firebase.json`, `.firebaserc`
+- **Codex 인수인계:** [AGENTS.md](./AGENTS.md), [Firebase 배포 절차](./docs/FIREBASE_CODEX_DEPLOY.md)
+- **배포 워크플로:** [Firebase Backend Action](./.github/workflows/firebase-backend.yml) — 안전을 위해 수동 실행만 가능, Google Cloud Workload Identity Federation 연결 전에는 배포 불가
+- **유료 AI 안전장치:** 로그인이 필요하고 사용 허용된 Firebase UID만 AI를 호출하도록 `MEAL_ALLOWED_UIDS` Secret 검증, 각 UID별 일일 횟수 제한
+- **주의:** 이 업데이트는 **코드 배포 준비**입니다. Firebase 프로젝트의 Cloud Functions·Storage를 실제로 배포한 것은 아닙니다. 이미 성공한 로그인·Firestore 사용 상태는 그대로 유지합니다. 현재 라이브 Rules는 Codex Firebase 플러그인에서 비교 검증하기 전에는 덮어쓰지 않습니다.

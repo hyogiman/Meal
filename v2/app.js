@@ -143,7 +143,7 @@ $("#generatePlan").addEventListener("click",()=>{
  draft=generatePlan({stock:state.inventory,planned:state.cart,includePlanned:$("#includeCart").checked,weekStart:planWeek,maxMinutes:Number($("#planTime").value),basics:{rice:$("#assumeRice").checked,kimchi:$("#assumeKimchi").checked,seasonings:true}});
  $("#planStatus").textContent="식단 초안입니다. 수량 미확인과 부족한 재료를 검토한 뒤 저장해 주세요. 재고는 차감하지 않았습니다.";renderPlanner();
 });
-$("#planBudget").addEventListener("change",e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&n>=1000){state.settings.budget=n;if(mode==="local")localWrite();else notify("예산 변경은 이 세션에서만 적용됩니다. Firebase 설정 동기화는 다음 버전에서 제공합니다.");render();}});
+$("#planBudget").addEventListener("change",async e=>{const n=Number(e.target.value);if(!Number.isSafeInteger(n)||n<1000||n>10000000){alert("예산은 1,000원 이상 1,000만 원 이하로 입력해 주세요.");e.target.value=budget();return;}try{if(mode==="cloud")await setDoc(dbRef("settings","preferences"),{id:"preferences",budget:n,updatedAt:new Date().toISOString()});else{state.settings.budget=n;localWrite();}render();notify("주간 예산 설정을 저장했습니다.");}catch(err){notify("예산 저장 실패: "+err.message,true);}});
 $("#savePlan").addEventListener("click",async()=>{
  if(!draft)return;try{
   const plan={...draft,id:planWeek,weekStart:planWeek,updatedAt:new Date().toISOString()};
@@ -225,7 +225,7 @@ function renderHome(){
  $("#weekendDescription").textContent=weekend?"지금은 다음 주("+next+" 시작) 식단을 준비하기 좋은 때입니다. 재고 수량을 확인하고 추천을 생성해 보세요.":"주말에는 다음 주 식재료와 상차림 준비를 제안합니다. 언제든 다음 주 식단을 미리 만들 수 있습니다.";
  $("#homeNextChecklist").innerHTML='<span class="chip">수량 미확인 '+state.inventory.filter(x=>x.quantity==null).length+'종</span><span class="chip">구매 예정 '+state.cart.length+'개</span><span class="chip">실제 구매 '+state.purchases.length+'건</span>';
 }
-function render(){renderHome();renderInventory();renderCart();renderPurchases();if(active==="planner")renderPlanner();}
+function render(){if(document.activeElement!==$("#planBudget"))$("#planBudget").value=budget();renderHome();renderInventory();renderCart();renderPurchases();if(active==="planner")renderPlanner();}
 function download(name,text){const url=URL.createObjectURL(new Blob([text],{type:"application/json"})),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $("#exportData").addEventListener("click",()=>download("Meal_backup_"+today()+".json",JSON.stringify({schema:2,data:state,exportedAt:new Date().toISOString()},null,2)));
 $("#importData").addEventListener("click",()=>{if(mode==="cloud"){alert("JSON 복원은 로컬 모드에서 지원합니다. 로그아웃 후 가져와 주세요.");return;}$("#backupFile").click();});
@@ -250,11 +250,12 @@ function firebaseMode(u){
  unsubs.forEach(f=>f());unsubs=[];user=u;mode="cloud";state=empty();draft=null;
  $("#accountLabel").textContent=u.displayName||u.email||"Google 사용자";$("#loginBtn").hidden=true;$("#logoutBtn").hidden=false;$("#copyLocalToCloud").hidden=false;
  notify("Firestore 연결 중…");const got=new Set();
- for(const table of ["inventory","cart","purchases","plans"]){
+ for(const table of ["inventory","cart","purchases","plans","settings"]){
   const unsub=onSnapshot(collection(db,"users",u.uid,table),snap=>{
    if(table==="plans"){state.plans=Object.fromEntries(snap.docs.map(d=>[d.id,d.data()]));}
+   else if(table==="settings"){state.settings=snap.docs.find(d=>d.id==="preferences")?.data()||{budget:80000};}
    else state[table]=snap.docs.map(d=>d.data());
-   got.add(table);if(got.size===4)notify("Firebase 동기화 연결됨 · 로그인한 사용자 데이터가 저장됩니다.");render();
+   got.add(table);if(got.size===5)notify("Firebase 동기화 연결됨 · 로그인한 사용자 데이터가 저장됩니다.");render();
   },err=>notify("Firestore 권한 또는 연결 오류: "+(err.code||err.message)+". 데이터베이스와 보안 규칙을 확인하세요.",true));
   unsubs.push(unsub);
  }
@@ -269,6 +270,7 @@ $("#copyLocalToCloud").addEventListener("click",async()=>{
  try{
   const all=[...source.inventory.map(x=>["inventory",x]),...source.cart.map(x=>["cart",x]),...source.purchases.map(x=>["purchases",x]),...Object.entries(source.plans).map(([k,x])=>["plans",{...x,id:k}])];
   for(let i=0;i<all.length;i+=300){const b=writeBatch(db);for(const [table,row]of all.slice(i,i+300))b.set(dbRef(table,row.id),row);await b.commit();}
+  if(source.settings&&Number.isSafeInteger(Number(source.settings.budget)))await setDoc(dbRef("settings","preferences"),{id:"preferences",budget:Number(source.settings.budget),updatedAt:new Date().toISOString()});
   notify("로컬 기록 "+n+"개를 Firebase에 복사했습니다.");
  }catch(err){notify("가져오기 실패: "+err.message,true);}
 });

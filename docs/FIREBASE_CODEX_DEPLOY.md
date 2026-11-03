@@ -59,3 +59,11 @@
 6. AI 식단 출력이 7일 21끼인지, 미역만둣국 같은 생소한 조합을 기본 추천하지 않는지
 7. 기존 장보기 가계부 기록과 재고를 변경하지 않았는지
 8. Cloud Functions 로그의 예상 모델 호출 비용과 실패 건수 검토
+
+
+## 유료 AI 함수 사용 승인(필수)
+- Cloud Functions 배포 전 Firebase Secret Manager에 `OPENAI_API_KEY`와 **`MEAL_ALLOWED_UIDS`**를 등록하세요.
+- `MEAL_ALLOWED_UIDS` 값은 사용 승인된 가족 계정의 Firebase Authentication **UID를 쉼표로 연결**한 문자열입니다. 코드나 GitHub에 실제 UID 값을 적지 마세요.
+- 이 허용 목록에 없는 사용자는 로그인했더라도 유료 OpenAI 함수 호출이 거부됩니다. 현재 웹앱에서는 누구나 새 계정을 만들 수 있으므로 비용 보호에 필요합니다.
+- Secret Manager에 값이 없으면 함수가 정상 배포·실행되지 않을 수 있습니다.
+- 실제 Firebase Rules를 감사하기 전에는 `firestore.rules`를 자동 배포하지 마세요. GitHub의 Rules는 제안본일 뿐입니다.

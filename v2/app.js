@@ -109,7 +109,7 @@ $("#manualPurchaseBtn").addEventListener("click",()=>openPurchase(null));
 function openPurchase(r){
  $("#purchaseForm").reset();$("#purchaseCard").hidden=false;
  $("#purchaseHeading").textContent=r?"구매 확인: "+r.name:"새로 산 물건 직접 기록";
- $("#purchaseCartId").value=r?.id||"";$("#purchaseKey").value=r?.key||"";$("#purchaseName").value=r?.name||"";$("#purchaseQty").value=r?.quantity??"";$("#purchaseUnit").value=r?.unit||"g";$("#purchasePaid").value=r?.displayPrice??"";$("#purchaseDate").value=today();$("#purchaseStore").value=r?.store||"";$("#purchasePlace").value=["chicken","pork","mackerel","tofu","milk","sprouts","egg"].includes(r?.key)?"냉장":"실온";
+ $("#purchaseCartId").value=r?.id||"";$("#purchaseKey").value=r?.key||"";$("#purchaseName").value=r?.name||"";$("#purchaseQty").value=r?.quantity??"";$("#purchaseUnit").value=r?.unit||"g";$("#purchasePaid").value="";$("#purchasePaid").placeholder=r?"표시가 "+fmt(r.displayPrice)+" · 실제 결제금액 입력":"실제 결제금액 직접 입력";$("#purchaseDate").value=today();$("#purchaseStore").value=r?.store||"";$("#purchasePlace").value=["chicken","pork","mackerel","tofu","milk","sprouts","egg"].includes(r?.key)?"냉장":"실온";
  $("#purchaseCard").scrollIntoView({behavior:"smooth"});
 }
 $("#purchaseCancel").addEventListener("click",()=>{$("#purchaseCard").hidden=true;});

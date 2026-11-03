@@ -7,8 +7,9 @@ const OpenAI=require('openai');
 admin.initializeApp();
 const db=admin.firestore();
 const KEY=defineSecret('OPENAI_API_KEY');
+const ALLOWED=defineSecret('MEAL_ALLOWED_UIDS');
 const REGION='asia-northeast3';
-const OPTIONS={region:REGION,secrets:[KEY],maxInstances:2,timeoutSeconds:240,memory:'512MiB',
+const OPTIONS={region:REGION,secrets:[KEY,ALLOWED],maxInstances:2,timeoutSeconds:240,memory:'512MiB',
   cors:['https://hyogiman.github.io','https://mealplan-786a6.web.app','https://mealplan-786a6.firebaseapp.com']};
 const U={type:'object',additionalProperties:false,required:['name','qty','unit'],properties:{
   name:{type:'string'},qty:{type:'number'},unit:{type:'string'}}};
@@ -25,8 +26,8 @@ const PHOTO={type:'object',additionalProperties:false,required:['items','notes']
     name:{type:'string'},qty:{type:['number','null']},unit:{type:['string','null']},
     category:{type:['string','null']},confidence:{type:'string',enum:['high','medium','low']}}}},
   notes:{type:'string'}}};
-function uid(request){if(!request.auth?.uid)throw new HttpsError('unauthenticated','Meal 로그인 후 이용해 주세요.');return request.auth.uid;}
-function localDay(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+function uid(request){const id=request.auth?.uid;if(!id)throw new HttpsError('unauthenticated','Meal 로그인 후 이용해 주세요.');const allow=(ALLOWED.value()||'').split(',').map(s=>s.trim()).filter(Boolean);if(!allow.includes(id))throw new HttpsError('permission-denied','AI 기능은 등록된 가족 계정에서만 사용할 수 있습니다.');return id;}
+function localDay(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const value=t=>parts.find(p=>p.type===t)?.value||'';return value('year')+'-'+value('month')+'-'+value('day');}
 async function quota(user,field,cap){
   const ref=db.doc('users/'+user+'/usage/'+localDay());
   await db.runTransaction(async t=>{

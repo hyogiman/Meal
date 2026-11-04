@@ -450,7 +450,8 @@ async function aiMealPlan(){if(state.mode!=='cloud'||!functions||!fb?.functions)
  const date=$('#planDate').value;
  const payload={startDate:date,servings:Number($('#planServings').value),maxMinutes:Number($('#planTime').value),style:$('#planStyle').value};
  $('#aiPlan').disabled=true;$('#aiPlan').textContent='AI 요청 중…';
- try{const callable=fb.functions.httpsCallable(functions,'suggestMeals',{timeout:120000});const result=await callable(payload);const plan=result?.data?.plan;
+ // Allow the deployed function's 240-second deadline plus network overhead.
+ try{const callable=fb.functions.httpsCallable(functions,'suggestMeals',{timeout:270000});const result=await callable(payload);const plan=result?.data?.plan;
  if(!plan||!Array.isArray(plan.days)||plan.days.length!==7)throw Error('AI 응답 구조가 올바르지 않습니다.');
  if(!confirm('AI가 제안한 7일 식단을 저장할까요? 현재 계획은 교체됩니다. 각 재료와 양념·조리시간을 먼저 검토하세요.'))return;
  // Convert AI response to display-safe same shape; explicit missing and new recipes must be reviewed before recording as plan.
@@ -503,7 +504,7 @@ async function analyzePhotoFiles(files){
  $('#analyzePhotosBtn').disabled=true;$('#analyzePhotosBtn').textContent='사진 분석 중…';
  try{
   const images=[];for(const file of arr){const blob=await resizePhoto(file);const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('이미지 변환 실패'));reader.readAsDataURL(blob);});if(String(dataUrl).length>2_500_000)throw Error('이미지가 너무 큽니다.');images.push(dataUrl);}
-  const res=await fb.functions.httpsCallable(functions,'analyzeInventoryPhoto',{timeout:90000})({images});
+  const res=await fb.functions.httpsCallable(functions,'analyzeInventoryPhoto',{timeout:270000})({images});
   const candidates=res.data?.items;if(!Array.isArray(candidates))throw Error('AI 응답의 식재료 목록을 읽지 못했습니다.');
   photoCandidates=candidates.filter(x=>x.name&&typeof x.name==='string').slice(0,30);
   $('#photoCandidates').innerHTML=photoCandidates.length?photoCandidates.map((x,i)=>`<div class="list-row"><div class="row-info"><strong>${esc(x.name)}</strong><small>추정 수량 ${x.qty==null?'확인 필요':esc(x.qty)+' '+esc(x.unit||'')} · 확신도 ${esc(x.confidence||'알 수 없음')}</small></div><button class="tiny-button" data-photo-pick="${i}">이 재료 등록</button></div>`).join(''):'<div class="empty">명확하게 식별한 재료가 없습니다. 직접 등록을 이용해 주세요.</div>';

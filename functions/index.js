@@ -10,7 +10,7 @@ const KEY=defineSecret('OPENAI_API_KEY');
 const ALLOWED=defineSecret('MEAL_ALLOWED_UIDS');
 const REGION='asia-northeast3';
 const OPTIONS={region:REGION,secrets:[KEY,ALLOWED],maxInstances:2,timeoutSeconds:240,memory:'512MiB',
-  cors:['https://hyogiman.github.io','https://mealplan-786a6.web.app','https://mealplan-786a6.firebaseapp.com']};
+  cors:['https://hyogiman.github.io','https://2nhyeok.kr','https://mealplan-786a6.web.app','https://mealplan-786a6.firebaseapp.com']};
 const U={type:'object',additionalProperties:false,required:['name','qty','unit'],properties:{
   name:{type:'string'},qty:{type:'number'},unit:{type:'string'}}};
 const COURSE={type:'object',additionalProperties:false,required:['title','role','minutes','requiresRice','ingredients','seasonings','steps'],properties:{

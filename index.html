@@ -28,25 +28,26 @@ dialog{border:1px solid #dbe8dd;border-radius:20px;padding:0;box-shadow:0 25px 1
 <div class="home-grid"><article class="panel"><div class="panel-title"><h2>지금 가장 중요한 일</h2><span class="mini-label">추천 행동</span></div><div id="homeAction" class="action-feature">냉장고에 있는 식재료부터 추가해 보세요.</div><button id="homeActionBtn" class="primary" type="button">재고 등록하기 →</button></article><article class="panel"><div class="panel-title"><h2>이번 주 준비 상태</h2></div><div class="mini-steps"><div><span class="step-dot">1</span><span>재고 확인</span><b id="homeStep1">대기</b></div><div><span class="step-dot">2</span><span>장보기·구매 입고</span><b id="homeStep2">대기</b></div><div><span class="step-dot">3</span><span>현실적인 상차림 만들기</span><b id="homeStep3">대기</b></div></div></article></div>
 <div id="weekendTip" class="weekend-tip" hidden><strong>🌿 다음 주 장보기 준비</strong><p>금·토·일에는 남은 재료를 확인하고 다음 주에 필요한 것만 골라 장바구니에 담아 보세요.</p><button id="weekendPlanBtn" class="outline" type="button">다음 주 계획 만들기</button></div>
 </section>
-<section class="page" id="page-inventory"><div class="section-heading"><div><p class="eyebrow">PANTRY & FRIDGE</p><h1>우리 집 냉장고</h1><p>원재료, 냉동식품, 이미 조리한 음식까지 수량·보관위치·유통기한을 따로 관리합니다.</p></div><div class="shop-actions"><button id="analyzePhotosBtn" class="outline" type="button">📷 사진에서 재료 후보 추출</button><input type="file" id="analyzePhotosInput" multiple accept="image/*" hidden><button id="newInventory" class="primary" type="button">+ 식재료 등록</button></div></div>
+<section class="page" id="page-inventory"><div class="section-heading"><div><p class="eyebrow">PANTRY & FRIDGE</p><h1>우리 집 냉장고</h1><p>원재료, 냉동식품, 이미 조리한 음식까지 수량·보관위치·유통기한을 따로 관리합니다.</p></div><div class="shop-actions"><button id="newInventory" class="primary" type="button">+ 식재료 등록</button></div></div>
 <div class="metrics slim"><article class="metric"><small>사용 가능한 재고</small><strong id="stockCount">0종</strong></article><article class="metric"><small>냉장</small><strong id="stockFridge">0종</strong></article><article class="metric"><small>냉동</small><strong id="stockFreezer">0종</strong></article><article class="metric warning"><small>기한 임박·경과</small><strong id="stockUrgent">0종</strong></article></div>
 <div class="panel"><div class="tools-line"><label class="field search-field"><span class="sr-only">식재료 검색</span><input id="stockSearch" placeholder="식재료 검색 (예: 고등어, 두부)" type="search"></label><select id="stockStorage"><option value="">전체 보관위치</option><option>냉장</option><option>냉동</option><option>실온</option><option>팬트리</option><option>기타</option></select><select id="stockCategory"><option value="">전체 분류</option></select></div><div class="list-header"><h3>내 재료 목록</h3><span id="stockListHint">재료를 등록하면 여기에 나타납니다.</span></div><div id="stockList" class="stock-grid"></div></div><div class="hint"><b>중요:</b> 상품명이 '곰곰 두부'여도 재료명은 '두부'로 입력하면 레시피와 비교하기 쉽습니다. 수량이 불확실하면 임의로 1kg을 넣지 말고 실제로 확인하고 등록해 주세요.</div>
 </section>
 <section class="page" id="page-shopping"><div class="section-heading"><div><p class="eyebrow">SHOP & RECORD</p><h1>장보기와 실제 지출</h1><p>구매 예정과 실제 결제를 분리합니다. 구매를 확정한 품목만 재고에 입고할 수 있습니다.</p></div><button id="newPurchase" class="primary">+ 구매 기록</button></div><div class="budget-band"><div><span>이번 주 예산</span><strong id="shopBudget">80,000원</strong></div><div><span>실제로 쓴 돈</span><strong id="shopSpent">0원</strong></div><div><span>남은 예산</span><strong id="shopRemain">80,000원</strong></div></div><div class="progress-track"><div id="shopProgress"></div></div><div class="two-columns"><div class="panel"><div class="panel-title"><h2>살 물건 목록</h2><button id="newWishlist" class="text-button">+ 추가</button></div><p class="caption">가격은 예상가격입니다. 실제 지출로 잡히지 않습니다.</p><div id="wishList" class="stack-list"></div></div><div class="panel"><div class="panel-title"><h2>구매 내역</h2><button id="exportPurchases" class="text-button">CSV</button></div><div id="purchaseList" class="stack-list"></div></div></div><div class="hint">영수증 총액을 여러 품목으로 나누어 기록할 때는 각 품목의 실제 금액을 적어주세요. 품목별 합계가 실제 결제금액과 일치하는지 확인한 다음 저장하는 편이 안전합니다.</div></section>
-<section class="page" id="page-planner"><div class="section-heading"><div><p class="eyebrow">THE WEEKLY TABLE</p><h1>일주일 식단</h1><p>재고가 있으면 우선 활용하고, 부족한 재료는 구매가 필요하다고 분명하게 표시합니다.</p></div></div><div class="panel planner-controls"><div class="control-grid"><label class="field"><span>식단 시작 날짜</span><input id="planDate" type="date"></label><label class="field"><span>식사 인원</span><select id="planServings"><option value="2">성인 2명</option><option value="1">성인 1명</option><option value="3">성인 3명</option><option value="4">성인 4명</option></select></label><label class="field"><span>한 끼 조리 가능 시간</span><select id="planTime"><option value="20">20분 이하</option><option value="35" selected>35분 이하</option><option value="50">50분 이하</option></select></label><label class="field"><span>식단 취향</span><select id="planStyle"><option value="home">익숙한 한국 가정식</option><option value="varied">면 요리도 섞기</option></select></label></div><div class="plan-buttons"><button id="createPlan" class="primary">✦ 재고 기반 7일 식단 만들기</button><button id="aiPlan" class="outline" type="button">AI로 자세한 식단 추천</button></div><p class="caption">기본 추천은 기기에 내장된 규칙·레시피로 즉시 생성됩니다. AI 추천은 별도 Cloud Functions와 OpenAI 비밀키 배포 후 활성화됩니다. 어느 경우든 조리 전에 실제 수량을 확인해야 합니다.</p></div>
-<div id="planSummary" class="panel" hidden></div><div id="weeklyPlan" class="week-plan"></div><div class="panel" id="planEmpty"><div class="empty-icon">▦</div><h3>아직 식단을 만들지 않았습니다.</h3><p>먼저 냉장고 재고를 입력하고 ‘재고 기반 7일 식단 만들기’를 눌러주세요.</p></div><div id="nextWeekPrompt" class="panel" hidden><strong>다음 주 장보기 제안</strong><p>현재 재고에서 부족한 재료를 정리해 장보기 목록으로 옮길 수 있습니다.</p><button id="addMissingToWish" class="outline">부족 재료를 장보기 목록에 추가</button></div>
+<section class="page" id="page-planner"><div class="section-heading"><div><p class="eyebrow">ONE MEAL AT A TIME</p><h1>한 끼씩 채우는 식단</h1><p>후보 메뉴의 재료와 영양정보를 비교하고, 원하는 한 끼만 식단에 넣으세요.</p></div></div>
+<div class="panel planner-controls"><div class="control-grid"><label class="field"><span>먹을 날짜</span><input id="mealDate" type="date" required></label><label class="field"><span>끼니</span><select id="mealSlot"><option>아침</option><option>점심</option><option selected>저녁</option></select></label><label class="field"><span>식사 인원</span><select id="planServings"><option value="2">성인 2명</option><option value="1">성인 1명</option><option value="3">성인 3명</option><option value="4">성인 4명</option></select></label><label class="field"><span>한 끼 조리 가능 시간</span><select id="planTime"><option value="20">20분 이하</option><option value="35" selected>35분 이하</option><option value="50">50분 이하</option></select></label><label class="field"><span>식단 취향</span><select id="planStyle"><option value="home">익숙한 한국 가정식</option><option value="varied">면 요리도 섞기</option><option value="lowcarb">탄수화물 비중 줄이기</option></select></label></div><div class="plan-buttons"><button id="aiPlan" class="primary" type="button">AI 한 끼 메뉴 3개 추천</button><button id="createPlan" class="outline" type="button">내장 메뉴에서 고르기</button></div><p class="caption">추천은 저장되지 않습니다. 메뉴 하나를 선택한 뒤 ‘선택한 한 끼 반영’을 눌러야 식단에 들어갑니다. AI는 버튼을 누를 때만 호출됩니다.</p></div>
+<div class="panel"><label class="field"><span>보는 주 시작일</span><input id="planDate" type="date"></label><p class="caption">일주일을 모두 채울 필요 없이 필요한 끼니만 등록할 수 있습니다.</p></div>
+<div id="planSummary" class="panel" hidden></div><div id="weeklyPlan" class="week-plan"></div><div class="panel" id="planEmpty"><div class="empty-icon">▦</div><h3>아직 식단을 만들지 않았습니다.</h3><p>날짜와 끼니를 고른 뒤 메뉴를 추천받아 한 끼부터 채워보세요.</p></div><div id="nextWeekPrompt" class="panel" hidden><strong>저장한 식단의 장보기</strong><p>현재 재고에서 부족한 재료를 정리해 장보기 목록으로 옮길 수 있습니다.</p><button id="addMissingToWish" class="outline">부족 재료를 장보기 목록에 추가</button></div>
 </section>
-<section class="page" id="page-settings"><div class="section-heading"><div><p class="eyebrow">DATA & SETTINGS</p><h1>설정과 데이터</h1><p>Firebase 실시간 동기화, 예산, 기록 백업을 관리합니다.</p></div></div><div class="two-columns"><div class="panel"><h2>가계부 기본값</h2><form id="settingsForm" class="stack-form"><label class="field"><span>주간 식비 목표(원)</span><input id="budgetInput" type="number" min="10000" max="10000000" step="1000" value="80000" required></label><button class="primary" type="submit">예산 저장</button></form></div><div class="panel"><h2>연결 및 백업</h2><p class="small">현재 저장 모드: <b id="modeDescription">연결 준비 중</b></p><p class="small">로그인하면 본인 계정의 Firestore에 저장되어 같은 계정의 다른 기기에서 동기화됩니다. 가족 계정 공유는 아직 제공하지 않습니다.</p><div class="button-stack"><button class="outline" id="firebaseTest" type="button">🔎 Firebase 읽기·쓰기 연결 진단</button><p id="firebaseTestResult" class="small" role="status" aria-live="polite">로그인 후 진단 버튼을 누르면 본인 계정의 Firestore에 임시 문서를 저장·읽기·삭제합니다.</p><button class="outline" id="exportBackup">전체 데이터 JSON 백업</button><label class="outline file-label" for="importBackupFile">JSON 복원 파일 선택</label><input id="importBackupFile" type="file" accept=".json,application/json" hidden><button class="outline" id="importOldExpenses">이전 Meal 지출 기록 가져오기</button></div></div></div><div class="panel"><h2>AI 연동 상태</h2><p>사진을 인식하고 새 메뉴를 생성하는 기능은 <strong>Firebase Cloud Functions와 OpenAI API의 별도 배포</strong>가 완료되어야 작동합니다. 웹앱에 OpenAI API 비밀키를 입력하는 구조는 제공하지 않습니다.</p><p class="caption">서버 기능이 배포되지 않았을 경우 AI 버튼은 오류 대신 필요한 설정을 안내합니다. 현재 기본 식단은 내장 레시피로 생성합니다.</p><div class="button-stack"><a href="./README.md" target="_blank" rel="noopener">설치·배포 가이드 보기 ↗</a><a href="https://github.com/hyogiman/Meal" target="_blank" rel="noopener">GitHub 기존 저장소 ↗</a></div></div></section>
+<section class="page" id="page-settings"><div class="section-heading"><div><p class="eyebrow">DATA & SETTINGS</p><h1>설정과 데이터</h1><p>Firebase 실시간 동기화, 예산, 기록 백업을 관리합니다.</p></div></div><div class="two-columns"><div class="panel"><h2>가계부 기본값</h2><form id="settingsForm" class="stack-form"><label class="field"><span>주간 식비 목표(원)</span><input id="budgetInput" type="number" min="10000" max="10000000" step="1000" value="80000" required></label><button class="primary" type="submit">예산 저장</button></form></div><div class="panel"><h2>연결 및 백업</h2><p class="small">현재 저장 모드: <b id="modeDescription">연결 준비 중</b></p><p class="small">로그인하면 본인 계정의 Firestore에 저장되어 같은 계정의 다른 기기에서 동기화됩니다. 가족 계정 공유는 아직 제공하지 않습니다.</p><div class="button-stack"><button class="outline" id="firebaseTest" type="button">🔎 Firebase 읽기·쓰기 연결 진단</button><p id="firebaseTestResult" class="small" role="status" aria-live="polite">로그인 후 진단 버튼을 누르면 본인 계정의 Firestore에 임시 문서를 저장·읽기·삭제합니다.</p><button class="outline" id="exportBackup">전체 데이터 JSON 백업</button><label class="outline file-label" for="importBackupFile">JSON 복원 파일 선택</label><input id="importBackupFile" type="file" accept=".json,application/json" hidden><button class="outline" id="importOldExpenses">이전 Meal 지출 기록 가져오기</button></div></div></div><div class="panel"><h2>AI 연동 상태</h2><p>AI는 한 끼 메뉴 후보 3개를 추천합니다. 재료는 수동 입력하며, 추천 결과를 검토하고 선택해야 식단에 반영됩니다.</p><p class="caption">AI 호출에는 하루 횟수 제한이 없습니다. 내장 메뉴 선택은 API를 호출하지 않습니다.</p><div class="button-stack"><a href="./README.md" target="_blank" rel="noopener">설치·배포 가이드 보기 ↗</a><a href="https://github.com/hyogiman/Meal" target="_blank" rel="noopener">GitHub 기존 저장소 ↗</a></div></div></section>
 </div></main>
 <nav class="mobile-nav" aria-label="하단 메뉴"><button data-view="home" class="active">⌂<span>홈</span></button><button data-view="inventory">▣<span>냉장고</span></button><button data-view="shopping">▤<span>장보기</span></button><button data-view="planner">▦<span>식단</span></button><button data-view="settings">⚙<span>설정</span></button></nav>
 <dialog id="authDialog"><form id="authForm" class="dialog-body"><div class="dialog-head"><div><small>FIREBASE ACCOUNT</small><h2>Meal 로그인</h2></div><button type="button" class="icon-button" data-close="authDialog" aria-label="닫기">×</button></div><p class="small">로그인하면 본인의 재고와 가계부가 Firebase에 저장됩니다.</p><label class="field"><span>이메일</span><input id="authEmail" type="email" autocomplete="email" required></label><label class="field"><span>비밀번호</span><input id="authPassword" type="password" minlength="6" autocomplete="current-password" required></label><div class="dialog-actions"><button type="submit" class="primary">이메일 로그인</button><button type="button" id="signUp" class="outline">새 계정 만들기</button></div><button type="button" id="signGoogle" class="google-button" hidden>Google 계정으로 로그인 (별도 활성화 필요)</button><p id="authError" class="form-error" role="alert"></p><button type="button" id="useLocalMode" class="text-button">Firebase 설정 전 기기에서 체험하기</button></form></dialog>
-<dialog id="inventoryDialog"><form id="inventoryForm" class="dialog-body"><div class="dialog-head"><div><small>PANTRY DETAIL</small><h2 id="inventoryDialogTitle">식재료 등록</h2></div><button type="button" class="icon-button" data-close="inventoryDialog" aria-label="닫기">×</button></div><input id="inventoryId" type="hidden"><div class="form-grid"><label class="field span2"><span>식재료명 *</span><input id="invName" type="text" maxlength="70" list="commonNames" placeholder="예: 닭다리살, 시금치, 달걀" required></label><label class="field"><span>남은 양 *</span><input id="invQty" type="number" min="0" max="100000" step="0.01" inputmode="decimal" required placeholder="실제로 확인한 수량"></label><label class="field"><span>단위 *</span><select id="invUnit"></select></label><label class="field span2"><span>포장 단위당 실제 중량(g, 선택)</span><input id="invUnitGrams" type="number" step="1" min="1" max="200000" placeholder="예: 두부 1모=300g, 사과 1봉=1000g"><small>모·팩·봉·캔 등으로 재고를 기록했다면 포장의 중량을 입력해 주세요. 추측해서 채우지 않습니다.</small></label><label class="field"><span>식재료 분류</span><select id="invCategory"></select></label><label class="field"><span>보관위치</span><select id="invStorage"></select></label><label class="field"><span>구매·입고 날짜</span><input id="invBoughtAt" type="date"></label><label class="field"><span>소비기한 / 유통기한</span><input id="invExpiry" type="date"></label><label class="field span2"><span>식재료 사진 (선택)</span><input id="invPhoto" type="file" accept="image/*"><small>Firebase Storage를 별도 활성화해야 업로드됩니다. 사진을 AI가 자동 판독하지는 않습니다.</small></label><label class="field span2"><span>메모</span><textarea id="invNotes" rows="3" maxlength="400" placeholder="예: 2개 중 1개 개봉, 해동 후 바로 요리, 구매처 등"></textarea></label></div><div id="invPhotoPreview"></div><p id="inventoryError" class="form-error"></p><div class="dialog-actions"><button type="button" class="outline" data-close="inventoryDialog">취소</button><button type="submit" id="saveInventory" class="primary">식재료 저장</button></div></form></dialog>
+<dialog id="inventoryDialog"><form id="inventoryForm" class="dialog-body"><div class="dialog-head"><div><small>PANTRY DETAIL</small><h2 id="inventoryDialogTitle">식재료 등록</h2></div><button type="button" class="icon-button" data-close="inventoryDialog" aria-label="닫기">×</button></div><input id="inventoryId" type="hidden"><div class="form-grid"><label class="field span2"><span>식재료명 *</span><input id="invName" type="text" maxlength="70" list="commonNames" placeholder="예: 닭다리살, 시금치, 달걀" required></label><label class="field"><span>남은 양 *</span><input id="invQty" type="number" min="0" max="100000" step="0.01" inputmode="decimal" required placeholder="실제로 확인한 수량"></label><label class="field"><span>단위 *</span><select id="invUnit"></select></label><label class="field span2"><span>포장 단위당 실제 중량(g, 선택)</span><input id="invUnitGrams" type="number" step="1" min="1" max="200000" placeholder="예: 두부 1모=300g, 사과 1봉=1000g"><small>모·팩·봉·캔 등으로 재고를 기록했다면 포장의 중량을 입력해 주세요. 추측해서 채우지 않습니다.</small></label><label class="field"><span>식재료 분류</span><select id="invCategory"></select></label><label class="field"><span>보관위치</span><select id="invStorage"></select></label><label class="field"><span>구매·입고 날짜</span><input id="invBoughtAt" type="date"></label><label class="field"><span>소비기한 / 유통기한</span><input id="invExpiry" type="date"></label><label class="field span2"><span>메모</span><textarea id="invNotes" rows="3" maxlength="400" placeholder="예: 2개 중 1개 개봉, 해동 후 바로 요리, 구매처 등"></textarea></label></div><p id="inventoryError" class="form-error"></p><div class="dialog-actions"><button type="button" class="outline" data-close="inventoryDialog">취소</button><button type="submit" id="saveInventory" class="primary">식재료 저장</button></div></form></dialog>
 <dialog id="adjustDialog"><form id="adjustForm" class="dialog-body"><div class="dialog-head"><div><small>INVENTORY EVENT</small><h2 id="adjustTitle">재고 사용·폐기</h2></div><button type="button" class="icon-button" data-close="adjustDialog" aria-label="닫기">×</button></div><input id="adjustId" type="hidden"><label class="field"><span>기록 유형</span><select id="adjustType"><option value="used">요리에 사용함</option><option value="discarded">폐기함</option><option value="add">수량을 추가함</option></select></label><label class="field"><span id="adjustAmountLabel">수량</span><input id="adjustAmount" type="number" step="0.01" min="0.01" required></label><label class="field"><span>사유·메모</span><input id="adjustNotes" type="text" maxlength="200" placeholder="예: 닭볶음탕 300g 사용"></label><p id="adjustError" class="form-error"></p><div class="dialog-actions"><button type="button" class="outline" data-close="adjustDialog">취소</button><button type="submit" class="primary">기록 저장</button></div></form></dialog>
 <dialog id="purchaseDialog"><form id="purchaseForm" class="dialog-body"><div class="dialog-head"><div><small>REAL PURCHASE</small><h2>구매 기록</h2></div><button class="icon-button" type="button" data-close="purchaseDialog" aria-label="닫기">×</button></div><div class="form-grid"><label class="field span2"><span>상품·식재료 이름 *</span><input id="purName" required maxlength="80" placeholder="예: 돼지고기 앞다리살"></label><label class="field"><span>수량</span><input id="purQty" type="number" min="0.01" max="100000" step="0.01" required inputmode="decimal"></label><label class="field"><span>단위</span><select id="purUnit"></select></label><label class="field span2"><span>포장 단위당 실제 중량(g, 선택)</span><input id="purUnitGrams" type="number" step="1" min="1" max="200000" placeholder="예: 1팩 500g"><small>재고로 입고한 포장상품을 레시피의 g 단위와 대조하는 데 사용합니다.</small></label><label class="field"><span>실제 결제금액 (원) *</span><input id="purCost" type="number" min="1" max="99999999" step="1" required inputmode="numeric"></label><label class="field"><span>구매 날짜</span><input id="purDate" type="date" required></label><label class="field"><span>구매처</span><input id="purStore" maxlength="60" placeholder="예: 쿠팡 로켓프레시"></label><label class="field"><span>보관위치</span><select id="purStorage"></select></label><label class="field"><span>소비기한 (선택)</span><input id="purExpiry" type="date"></label><label class="field"><span>식재료 분류</span><select id="purCategory"></select></label><label class="field span2 check-row"><input id="purStock" type="checkbox" checked><span>구매 확정과 동시에 냉장고 재고로 입고 (같은 품목도 구매 건별 재고로 관리)</span></label><label class="field span2"><span>메모</span><input id="purMemo" maxlength="180" placeholder="예: 할인 쿠폰 적용 후 최종가"></label></div><p id="purchaseError" class="form-error"></p><div class="dialog-actions"><button class="outline" type="button" data-close="purchaseDialog">취소</button><button class="primary" type="submit">구매 확정 저장</button></div></form></dialog>
 <dialog id="wishlistDialog"><form id="wishForm" class="dialog-body"><div class="dialog-head"><div><h2>장보기 예정품목</h2></div><button type="button" class="icon-button" data-close="wishlistDialog">×</button></div><label class="field"><span>품목</span><input id="wishName" required maxlength="80"></label><div class="form-grid"><label class="field"><span>필요 수량</span><input id="wishQty" type="number" min="0.01" step="0.01" required></label><label class="field"><span>단위</span><select id="wishUnit"></select></label><label class="field span2"><span>예상가격 (원, 선택)</span><input id="wishEstimate" type="number" min="0" max="99999999" step="1" placeholder="정확한 가격을 모르면 비워 두세요"></label></div><div class="dialog-actions"><button class="outline" type="button" data-close="wishlistDialog">취소</button><button class="primary" type="submit">예정 목록 저장</button></div></form></dialog>
-<dialog id="photoReviewDialog"><div class="dialog-body"><div class="dialog-head"><div><small>AI PHOTO RECOGNITION</small><h2>사진에서 읽은 식재료 후보</h2></div><button type="button" class="icon-button" data-close="photoReviewDialog" aria-label="닫기">×</button></div><p class="caption">사진에서 품목이나 수량을 잘못 인식할 수 있습니다. 후보 중 하나를 선택하면 재고 등록 양식이 열리고, 수량·보관위치·소비기한을 직접 확인한 뒤 저장할 수 있습니다. 결과를 자동 저장하지 않습니다.</p><div id="photoCandidates" class="stack-list"></div><p id="photoAnalyzeMessage" class="form-error"></p><div class="dialog-actions"><button type="button" class="outline" data-close="photoReviewDialog">닫기</button></div></div></dialog>
 <dialog id="recipeDialog"><div class="dialog-body"><div class="dialog-head"><div><small>REAL COOKING PLAN</small><h2 id="recipeTitle">상차림 자세히 보기</h2></div><button type="button" class="icon-button" data-close="recipeDialog">×</button></div><div id="recipeDetail"></div><div class="dialog-actions"><button class="outline" type="button" data-close="recipeDialog">닫기</button></div></div></dialog>
-<dialog id="aiPlanReviewDialog" aria-labelledby="aiPlanReviewTitle"><div class="dialog-body"><div class="dialog-head"><h2 id="aiPlanReviewTitle">AI 식단 미리보기</h2><button type="button" class="icon-button" data-close="aiPlanReviewDialog" aria-label="닫기">×</button></div><p class="caption">아직 저장하지 않았습니다. 아래 7일 식단의 재료·양념·조리시간을 확인해 주세요. 저장 버튼을 누르면 해당 주의 기존 식단이 교체됩니다.</p><div id="aiPlanReviewContent"></div><p id="aiPlanReviewError" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="outline" data-close="aiPlanReviewDialog" autofocus>저장하지 않고 닫기</button><button type="button" class="primary" id="saveAiPlan">검토한 식단 저장</button></div></div></dialog>
+<dialog id="aiPlanReviewDialog" aria-labelledby="aiPlanReviewTitle"><div class="dialog-body"><div class="dialog-head"><h2 id="aiPlanReviewTitle">한 끼 메뉴 고르기</h2><button type="button" class="icon-button" data-close="aiPlanReviewDialog" aria-label="닫기">×</button></div><p id="aiPlanReviewTarget" class="caption"></p><p class="caption">아직 저장하지 않았습니다. 한 가지 메뉴를 선택하세요. 같은 날짜·끼니에 기존 메뉴가 있으면 그 한 끼만 교체합니다.</p><div id="aiPlanReviewContent" class="stack-list"></div><div id="selectedMealNutrition" aria-live="polite"></div><p id="aiPlanReviewError" class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="outline" data-close="aiPlanReviewDialog" autofocus>저장하지 않고 닫기</button><button type="button" class="primary" id="saveAiPlan" disabled>선택한 한 끼 반영</button></div></div></dialog>
 <div id="toast" role="status" aria-live="polite" hidden></div><datalist id="commonNames"></datalist><script type="module">
 /* Firebase Web API key is a PUBLIC project identifier, NOT an OpenAI secret.
    Protect Firestore/Storage using Security Rules and enabled Authentication. */
@@ -120,19 +121,48 @@ function inventoryTotals(items){
 }
 // A simple, clearly labeled reference-composition estimate. Not a food-label / validated dietary calculation.
 const PER100={밥:[28.7,2.7,.3],김치:[4.5,1.5,.5],달걀:[.8,12.6,10.6],돼지고기:[0,20,10],닭고기:[0,19,8],고등어:[0,19,13],두부:[2,8,5],콩나물:[3,3,.5],시금치:[3.6,2.9,.4],양배추:[5.8,1.3,.1],양파:[9.3,1.1,.1],당근:[9.6,.9,.2],감자:[17,2,.1],무:[4.2,.7,.1],대파:[7,1.7,.3],오이:[3.6,.7,.1],애호박:[3.1,1.2,.3],어묵:[15,10,4],만두:[22,8,7],카레가루:[49,10,10],소면:[75,11,1],파스타면:[74,13,1.5],마늘:[33,6.4,.5],청경채:[2.2,1.5,.2],참치:[0,24,2],식용유:[0,0,100],참기름:[0,0,100],설탕:[100,0,0],고추장:[42,5,3],진간장:[8,6,0],국간장:[8,6,0],고춧가루:[52,12,14],깨:[24,18,50],된장:[21,12,6]};
-function nutritionEstimate(meal,servings=2){
- const foods=meal.courses.flatMap(c=>[...(c.ingredients||[]),...(c.seasonings||[])]);
- const hasRice=meal.courses.some(c=>c.requiresRice!==false && c.role!=='side' && c.role!=='bowl');
- // 300g cooked rice for two when not already listed as a bowl ingredient; plus 80g kimchi.
- if(hasRice)foods.push(A('밥',300)); foods.push(A('김치',80));
- const out=[0,0,0];let known=0,total=0;
- for(const x of foods){const r=PER100[normalizedName(x.name)];total++;
-  if(!r)continue;known++;let grams=x.unit==='캔'?150*x.qty:x.unit==='개'&&x.name==='달걀'?50*x.qty:x.unit==='봉'&&x.name==='김'?5*x.qty:x.qty;
-  r.forEach((v,i)=>out[i]+=(v*grams/100));}
- const [c,p,f]=out.map(n=>n/servings),k=Math.round((4*c+4*p+9*f)/10)*10;
- return {kcal:k,carbs:Math.round(c),protein:Math.round(p),fat:Math.round(f),coverage:total?known/total:0,rough:true};
+function ingredientScale(meal){return meal.amountBasis==='servings'||String(meal.source||'').startsWith('AI')?1:(Number(meal.servings)||2)/2;}
+function nutritionName(name){const n=normalizedName(name);return ({간장:'진간장',다진마늘:'마늘',올리브유:'식용유',카놀라유:'식용유',설탕:'설탕'})[n]||n;}
+function nutritionEstimate(meal,servings=meal.servings||2){
+ const scale=ingredientScale({...meal,servings}),foods=meal.courses.flatMap(c=>[...(c.ingredients||[]),...(c.seasonings||[])]).map(x=>({...x,qty:Number(x.qty)*scale}));
+ const hasRice=meal.courses.some(c=>c.requiresRice!==false&&c.role!=='side'&&c.role!=='bowl')&&!foods.some(x=>normalizedName(x.name)==='밥');
+ if(hasRice)foods.push(A('밥',150*servings));foods.push(A('김치',40*servings));
+ const out=[0,0,0],unknown=[];let known=0,total=0;
+ for(const x of foods){const name=nutritionName(x.name);if(['물','소금','후추'].includes(name))continue;total++;
+  const r=PER100[name];let grams=null;
+  if(['g','kg','ml','L'].includes(x.unit))grams=toBase(x.qty,x.unit)*(['식용유','참기름'].includes(name)&&['ml','L'].includes(x.unit)?.92:1);
+  else if(x.unit==='개'&&name==='달걀')grams=50*x.qty;
+  if(!r||grams==null||!Number.isFinite(grams)||grams<0){unknown.push(String(x.name));continue;}
+  known++;r.forEach((v,i)=>out[i]+=v*grams/100);
+ }
+ const [c,p,f]=out.map(n=>n/servings),energy=4*c+4*p+9*f;
+ return {kcal:Math.round(energy),carbs:Math.round(c*10)/10,protein:Math.round(p*10)/10,fat:Math.round(f*10)/10,carbShare:energy?100*4*c/energy:0,coverage:total?known/total:0,unknown:[...new Set(unknown)],rough:true};
 }
-
+function nutritionAlert(n){
+ if(n.unknown?.length||!n.kcal)return '영양자료가 부족해 탄수화물 비중 판정을 보류합니다.';
+ return n.carbShare>65?'탄수화물 비중이 약 '+n.carbShare.toFixed(1)+'%로 높습니다. 밥·면의 양과 단백질·채소 구성을 함께 살펴보세요.':'';
+}
+function nutritionHTML(n){return `<p class="small">1인분 추정 · ${n.kcal}kcal · 탄수화물 ${n.carbs}g · 단백질 ${n.protein}g · 지방 ${n.fat}g${n.unknown?.length?' · 일부 재료 미반영':''}</p>${nutritionAlert(n)?`<p class="missing-box" role="status">${esc(nutritionAlert(n))}</p>`:''}`;}
+function mealItems(meal){return meal.courses.flatMap(c=>[...(c.ingredients||[]),...(c.seasonings||[])]).filter(x=>!['밥','김치','물'].includes(normalizedName(x.name))).map(x=>({...x,qty:Number(x.qty)*ingredientScale(meal)}));}
+function recalculatePlan(plan,inventory){
+ const copy=structuredClone(plan),left=inventoryTotals(inventory),shortages=new Map();
+ for(const day of copy.days)for(const meal of day.meals){
+  meal.servings=Number(meal.servings)||Number(copy.servings)||2;meal.nutrition=nutritionEstimate(meal);meal.missing=[];
+  for(const x of mealItems(meal)){let remain=toBase(x.qty,x.unit);const name=normalizedName(x.name);
+   for(const lot of left.filter(v=>v.normalized===name&&compatibleUnits(v.comparisonUnit||v.unit,x.unit)).sort((a,b)=>(a.expiryDate||'9999').localeCompare(b.expiryDate||'9999'))){const take=Math.min(remain,lot.baseQty);lot.baseQty-=take;remain-=take;if(remain<=0)break;}
+   if(remain>.001){const unit=x.unit==='kg'?'g':x.unit==='L'?'ml':x.unit,item={name:x.name,unit,qty:Math.round(remain*100)/100};meal.missing.push(item);const key=name+'|'+unit,old=shortages.get(key);if(old)old.qty+=item.qty;else shortages.set(key,{...item});}
+  }
+ }
+ copy.missing=[...shortages.values()].map(x=>({...x,qty:Math.round(x.qty*100)/100}));return copy;
+}
+function mergeMealIntoPlan(existing,target,meal,inventory){
+ const start=target.startDate||weekStart(target.date),plan=existing?structuredClone(existing):{id:start,startDate:start,servings:meal.servings,maxMinutes:target.maxMinutes,days:Array.from({length:7},(_,i)=>({date:plusDays(start,i),meals:[]})),createdAt:new Date().toISOString()};
+ const row=plan.days.find(d=>d.date===target.date);if(!row)throw Error('선택한 날짜가 해당 주에 없습니다.');
+ const candidate={...structuredClone(meal),slot:target.slot};const pos=row.meals.findIndex(m=>m.slot===target.slot);
+ if(pos<0)row.meals.push(candidate);else row.meals[pos]=candidate;
+ row.meals.sort((a,b)=>['아침','점심','저녁'].indexOf(a.slot)-['아침','점심','저녁'].indexOf(b.slot));plan.source='한 끼씩 선택한 식단';plan.updatedAt=new Date().toISOString();
+ return recalculatePlan(plan,inventory);
+}
 function buildMeal(recipe,extraSide=null,servings=2){
  const courses=extraSide?[recipe,extraSide]:[recipe];
  return {id:newId(),recipeId:recipe.id,sideRecipeId:extraSide?.id||null,courses,servings,title:recipe.title+(extraSide?' + '+extraSide.title:''),minutes:courses.reduce((sum,c)=>sum+c.minutes,0),source:'규칙 기반 추천',cookConfirmed:false};
@@ -225,7 +255,7 @@ const createUID=()=>globalThis.crypto?.randomUUID?.()||`local_${Date.now()}_${Ma
 const collections=['inventory','purchases','wishlist','plans','events'];
 const initial=()=>({inventory:[],purchases:[],wishlist:[],plans:[],events:[],settings:{budget:80000}});
 const state={...initial(),mode:'pending',user:null,activeView:'home',stockSearch:'',stockStorage:'',stockCategory:'',activeWeek:weekStart(dlocal()),activePlanId:null,loading:false};
-let fb=null, auth=null, db=null, storage=null, functions=null, disconnects=[],authUnsub=null,toastTimeout=null,photoObjURL=null;
+let fb=null, auth=null, db=null, functions=null, disconnects=[],authUnsub=null,toastTimeout=null;
 const notified=new Set();
 function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>el.hidden=true,4400);}
 function notice(t){const el=$('#appNotice');el.textContent=t;el.hidden=!t;}
@@ -240,10 +270,10 @@ function parseAuthError(e){const c=e?.code||'';return c.includes('invalid-email'
 async function initFirebase(){
  try{
    const base='https://www.gstatic.com/firebasejs/13.1.0/';
-   const [a,b,c,d,e]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js'),import(base+'firebase-storage.js'),import(base+'firebase-functions.js')]);
-   fb={app:a,auth:b,firestore:c,storage:d,functions:e};
+   const [a,b,c,e]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js'),import(base+'firebase-functions.js')]);
+   fb={app:a,auth:b,firestore:c,functions:e};
    const app=a.initializeApp(firebaseConfig);
-   auth=b.getAuth(app);db=c.getFirestore(app);storage=d.getStorage(app);functions=e.getFunctions(app,'asia-northeast3');
+   auth=b.getAuth(app);db=c.getFirestore(app);functions=e.getFunctions(app,'asia-northeast3');
    authUnsub=b.onAuthStateChanged(auth,async user=>{if(user){await activateCloud(user);}else if(state.mode!=='local'){
      state.user=null;labelSync('로그인 필요','warn');$('#authToggle').textContent='로그인';
      notice('Firebase 프로젝트가 준비되었습니다. 이메일 또는 Google 로그인으로 내 기록을 불러오거나 기기 저장 모드로 체험해 보세요.');if(safeLocalGet('meal_v2_prefer_local')==='yes')useLocal();else $('#authDialog').showModal();
@@ -308,7 +338,7 @@ function initStatic(){
  for(const id of ['invCategory','purCategory'])formOptions($('#'+id),CATEGORIES);
  formOptions($('#stockCategory'),['',...CATEGORIES]);$('#stockCategory').options[0].textContent='전체 분류';
  $('#commonNames').innerHTML=COMMON_NAMES.map(x=>`<option value="${esc(x)}"></option>`).join('');
- $('#planDate').value=weekStart(dlocal());$('#purDate').value=dlocal();$('#invBoughtAt').value=dlocal();
+ $('#planDate').value=weekStart(dlocal());$('#mealDate').value=dlocal();$('#purDate').value=dlocal();$('#invBoughtAt').value=dlocal();
  if([5,6,0].includes(new Date().getDay())){$('#weekendTip').hidden=false;$('#nextWeekPrompt').hidden=false;}
 }
 function navigate(view){state.activeView=view;$$('.page').forEach(x=>x.classList.toggle('active',x.id==='page-'+view));$$('[data-view]').forEach(x=>{x.classList.toggle('active',x.dataset.view===view);x.setAttribute('aria-current',x.dataset.view===view?'page':'false')});window.scrollTo({top:0,behavior:'smooth'});renderAll();}
@@ -317,8 +347,8 @@ function renderHome(){
  const stock=state.inventory.filter(x=>Number(x.qty)>0),spent=weekSpent(),plan=planFor(weekStart(dlocal()));
  $('#homeSpent').textContent=money(spent);$('#homeBudgetInfo').textContent='남은 예산 '+money(budget()-spent);
  $('#homeStock').textContent=new Set(stock.map(x=>normalizedName(x.name))).size+'종';$('#homeExpiring').textContent='소비기한 임박·경과 '+upcomingCount()+'건';
- $('#homePlan').textContent=plan?'21끼 계획':'미생성';$('#homeMissing').textContent=plan?'부족 재료 '+(plan.missing?.length||0)+'종 확인':'먼저 재고를 기록해 주세요';
- $('#homeStep1').textContent=stock.length?'진행 중':'대기';$('#homeStep2').textContent=state.purchases.length?'기록 '+state.purchases.length+'건':'대기';$('#homeStep3').textContent=plan?'완료':'대기';
+ $('#homePlan').textContent=plan?plan.days.reduce((n,d)=>n+d.meals.length,0)+'끼 계획':'미생성';$('#homeMissing').textContent=plan?'부족 재료 '+(plan.missing?.length||0)+'종 확인':'먼저 재고를 기록해 주세요';
+ $('#homeStep1').textContent=stock.length?'진행 중':'대기';$('#homeStep2').textContent=state.purchases.length?'기록 '+state.purchases.length+'건':'대기';$('#homeStep3').textContent=plan?'한 끼씩 구성 중':'대기';
  const action=stock.length===0?['냉장고 재고를 먼저 등록해야 현실적인 식단이 나옵니다.','재고 등록하기','inventory']:upcomingCount()>0?['소비기한이 가까운 재료가 '+upcomingCount()+'종 있습니다. 우선 확인해 주세요.','재고 확인하기','inventory']:!plan?['재고가 준비됐다면 조리 가능한 시간에 맞춰 이번 주 식단을 구성해 보세요.','식단 구성하기','planner']:['식단에서 부족한 재료를 확인하고 구매하기 전에 수량을 검토하세요.','식단 확인하기','planner'];
  $('#homeAction').textContent=action[0];$('#homeActionBtn').textContent=action[1]+' →';$('#homeActionBtn').dataset.target=action[2];
 }
@@ -330,7 +360,7 @@ function renderInventory(){
  $('#stockListHint').textContent=rows.length+'개 기록';
  $('#stockList').innerHTML=rows.length?rows.map(x=>{
   const [expire,cls]=expiryLabel(x.expiryDate),quantity=Number(x.qty),e=esc;
-  return `<article class="stock-card">${x.photoURL?`<img class="stock-thumb" src="${e(x.photoURL)}" loading="lazy" alt="${e(x.name)} 사진">`:''}<div class="stock-card-head"><div class="stock-name">${e(x.name)}</div><span class="tag ${cls}">${e(expire)}</span></div><div class="stock-qty">${quantity.toLocaleString('ko-KR')} <small>${e(x.unit)}</small></div><div class="stock-info"><div>${e(x.category||'미분류')} · ${e(x.storage||'보관위치 미지정')}</div><div>입고일 ${e(shortDate(x.boughtAt))} / 소비기한 ${e(shortDate(x.expiryDate))}</div>${x.notes?`<div>${e(x.notes)}</div>`:''}</div><div class="stock-actions"><button class="tiny-button" data-use="${e(x.id)}">사용·폐기</button><button class="tiny-button" data-edit-stock="${e(x.id)}">수정</button><button class="danger-button" data-del-stock="${e(x.id)}">삭제</button></div></article>`;
+  return `<article class="stock-card"><div class="stock-card-head"><div class="stock-name">${e(x.name)}</div><span class="tag ${cls}">${e(expire)}</span></div><div class="stock-qty">${quantity.toLocaleString('ko-KR')} <small>${e(x.unit)}</small></div><div class="stock-info"><div>${e(x.category||'미분류')} · ${e(x.storage||'보관위치 미지정')}</div><div>입고일 ${e(shortDate(x.boughtAt))} / 소비기한 ${e(shortDate(x.expiryDate))}</div>${x.notes?`<div>${e(x.notes)}</div>`:''}</div><div class="stock-actions"><button class="tiny-button" data-use="${e(x.id)}">사용·폐기</button><button class="tiny-button" data-edit-stock="${e(x.id)}">수정</button><button class="danger-button" data-del-stock="${e(x.id)}">삭제</button></div></article>`;
  }).join(''):'<div class="empty">등록한 식재료가 없거나 검색 결과가 없습니다.<br>‘+ 식재료 등록’을 눌러 실제 남은 양을 기록해 보세요.</div>';
 }
 function renderShopping(){const b=budget(),s=weekSpent(),rem=b-s;
@@ -342,46 +372,46 @@ function renderShopping(){const b=budget(),s=weekSpent(),rem=b-s;
 function safeFilename(s){return String(s||'Meal').replace(/[^a-zA-Z0-9가-힣_-]/g,'_').slice(0,40);}
 function download(filename,text,type='application/json'){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1300);}
 function csvCell(x){let v=String(x??'');if(/^\s*[=+@-]/.test(v))v="'"+v;return '"'+v.replaceAll('"','""')+'"';}
-function mealReadyCourse(meal){const hasBowl=meal.courses.some(c=>c.role==='bowl');return hasBowl?'김치만 곁들이기':'밥(1인 약 150g) + 김치(1인 약 40g)';}
+function mealReadyCourse(meal){const rice=meal.courses.some(c=>c.requiresRice!==false&&c.role!=='side'&&c.role!=='bowl')&&!meal.courses.some(c=>c.ingredients.some(x=>normalizedName(x.name)==='밥'));return rice?'밥(1인 약 150g) + 김치(1인 약 40g)':'김치만 별도로 곁들이기';}
 function totalsForPlan(p){let cooked=0,miss=0;for(const day of p.days||[]){for(const m of day.meals||[]){cooked+=m.minutes||0;miss+=(m.missing||[]).length;}}return {cooked,miss};}
 function planStockStatus(meal){const n=(meal.missing||[]).length;return n?`<span class="tag warn">부족 ${n}종</span>`:'<span class="tag">재료 계획상 충족</span>';}
 function renderPlans(){
- const selected=$('#planDate').value||weekStart(dlocal()),plan=planFor(selected);
+ const original=planFor($('#planDate').value||weekStart(dlocal())),plan=original?recalculatePlan(original,state.inventory):null;
  $('#planEmpty').hidden=!!plan;$('#planSummary').hidden=!plan;$('#nextWeekPrompt').hidden=!plan;
  if(!plan){$('#weeklyPlan').innerHTML='';return;}
- const stats=totalsForPlan(plan),unique=plan.missing||[];
- $('#planSummary').innerHTML=`<div class="panel-title"><h2>이번 식단의 조리 계획</h2><span class="tag neutral">${esc(plan.source||'규칙 기반')}</span></div><div class="plan-stats"><div><small>계획 인원</small><strong>${Number(plan.servings)||2}명</strong></div><div><small>21끼 총 조리시간</small><strong>약 ${stats.cooked}분</strong></div><div><small>부족 재료(중복 합산)</small><strong>${unique.length}종</strong></div></div><p class="caption">총 조리시간은 각 끼니에 실제 새로 만드는 국·주찬·부찬의 시간을 합산한 값입니다. 밥은 이미 준비되어 있다고 가정합니다. 병렬 작업의 단축효과는 차감하지 않았습니다.</p>${unique.length?`<div class="plan-issues"><h4>확인·추가 구매가 필요한 재료</h4><div class="plan-issues-list">${unique.map(x=>`<span class="tag warn">${esc(x.name)} ${Math.round(Number(x.qty)*100)/100}${esc(x.unit)}</span>`).join('')}</div><p class="caption">이 수량은 현재 등록 재고를 기준으로 계획 전체에서 계산한 대략적인 부족량입니다. 레시피 대체와 재고 수량 확인 후 실제 장바구니에 반영하세요.</p></div>`:''}`;
- $('#weeklyPlan').innerHTML=(plan.days||[]).map(d=>{
-  const weekday='일월화수목금토'[new Date(d.date+'T12:00:00').getDay()];
-  return `<article class="day-card"><header class="day-header"><h3>${esc(d.date)} (${weekday})</h3><span>1인 하루 약 ${(d.meals||[]).reduce((sum,m)=>sum+Number(m.nutrition?.kcal||0),0).toLocaleString('ko-KR')}kcal · 개략 추정</span></header><div class="day-meals">${(d.meals||[]).map(m=>`<div class="meal-card"><div class="meal-top"><span>${esc(m.slot)}</span><span>⏱ 총 ${Math.round(m.minutes||0)}분</span></div><h4>${esc(m.title)}</h4><div class="meal-courses"><p>${esc(mealReadyCourse(m))}</p>${m.courses?.length>1?`<p><b>별도 조리:</b> ${esc(m.courses[1].title)} (${m.courses[1].minutes}분 추가)</p>`:''}</div><div class="meal-meta">${planStockStatus(m)}${m.nutrition?`<span class="tag neutral">약 ${m.nutrition.kcal}kcal/인</span>${m.nutrition.protein<15?'<span class="tag warn">단백질 보완 고려</span>':''}`:''}</div>${(m.missing||[]).length?`<div class="missing-box"><strong>아직 부족한 재료</strong><p>${m.missing.map(x=>`${esc(x.name)} ${Math.round(Number(x.qty)*10)/10}${esc(x.unit)}`).join(' · ')}</p></div>`:''}<div class="meal-actions"><button class="tiny-button" data-show-recipe="${esc(d.date)}|${esc(m.slot)}">상차림·레시피</button><button class="tiny-button" data-replace-meal="${esc(d.date)}|${esc(m.slot)}">다른 메뉴</button></div></div>`).join('')}</div></article>`;
+ const stats=totalsForPlan(plan),unique=plan.missing||[],count=plan.days.reduce((n,d)=>n+d.meals.length,0);
+ $('#planSummary').innerHTML=`<h2>저장한 ${count}끼 식단</h2><div class="plan-stats"><div><small>등록한 끼니</small><strong>${count}끼</strong></div><div><small>총 조리시간</small><strong>약 ${stats.cooked}분</strong></div><div><small>부족 재료</small><strong>${unique.length}종</strong></div></div>${unique.length?`<p class="caption">${unique.map(x=>`${esc(x.name)} ${x.qty}${esc(x.unit)}`).join(' · ')}</p>`:''}`;
+ $('#weeklyPlan').innerHTML=plan.days.map(d=>{
+  const total=d.meals.reduce((n,m)=>n+m.nutrition.kcal,0);
+  return `<article class="day-card"><header class="day-header"><h3>${esc(d.date)} (${'일월화수목금토'[new Date(d.date+'T12:00:00').getDay()]})</h3><span>등록 ${d.meals.length}끼 · 1인분 합계 약 ${total}kcal</span></header><div class="day-meals">${['아침','점심','저녁'].map(slot=>{
+   const m=d.meals.find(x=>x.slot===slot),button=`<button class="tiny-button" data-replace-meal="${esc(d.date)}|${slot}">${m?'메뉴 골라 바꾸기':'이 끼니 채우기'}</button>`;
+   if(!m)return `<div class="meal-card"><span>${slot}</span><p class="caption">비워 둔 끼니</p>${button}</div>`;
+   return `<div class="meal-card"><div class="meal-top"><span>${slot} · ${m.servings}인분</span><span>⏱ ${m.minutes}분</span></div><h4>${esc(m.title)}</h4><p class="small">${esc(mealReadyCourse(m))}</p>${nutritionHTML(m.nutrition)}${m.missing.length?`<div class="missing-box"><strong>부족 재료</strong><p>${m.missing.map(x=>`${esc(x.name)} ${x.qty}${esc(x.unit)}`).join(' · ')}</p></div>`:''}<div class="meal-actions"><button class="tiny-button" data-show-recipe="${esc(d.date)}|${slot}">상차림·레시피</button>${button}</div></div>`;
+  }).join('')}</div></article>`;
  }).join('');
 }
 function recipeHTML(meal){
- const nutr=meal.nutrition||nutritionEstimate(meal,meal.servings);
+ const nutr=nutritionEstimate(meal,meal.servings);
  return `<div class="recipe-meal-overview"><span class="tag">${Number(meal.servings)||2}인분</span><span class="tag">전체 조리 약 ${meal.minutes}분</span><span class="tag neutral">약 ${nutr.kcal}kcal/인 (참고 추정)</span></div>
- <div class="recipe-pantry"><b>기본 상차림:</b> ${esc(mealReadyCourse(meal))}. 이 외의 국과 반찬은 자동으로 준비되어 있다고 보지 않습니다. 아래에 나오는 조리법의 음식은 모두 실제로 만들어야 합니다.</div>
- ${(meal.courses||[]).map((c,j)=>`<section class="recipe-course"><h3>${j+1}. ${esc(c.title)} <span class="tag neutral">별도 조리 ${c.minutes}분</span></h3><h4>재료 (${meal.servings}인분)</h4><ul>${c.ingredients.map(x=>`<li>${esc(x.name)}: ${Math.round(x.qty*meal.servings/2*100)/100}${esc(x.unit)}</li>`).join('')}</ul><div class="season-block"><b>양념 계량</b><ul>${c.seasonings?.length?c.seasonings.map(x=>`<li>${esc(x.name)} ${Math.round(x.qty*meal.servings/2*100)/100}${esc(x.unit)}</li>`).join(''):'<li>별도 양념 없음</li>'}</ul><small>재료 양과 염도에 따라 간을 마지막에 조절하세요. 큰술은 15ml, 작은술은 5ml 기준입니다.</small></div><h4>조리 순서</h4><ol>${c.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></section>`).join('')}
- <div class="mini-divider"></div><div class="detail-grid"><div class="detail-kpi"><small>탄수화물</small><strong>약 ${nutr.carbs}g/인</strong></div><div class="detail-kpi"><small>단백질</small><strong>약 ${nutr.protein}g/인</strong></div><div class="detail-kpi"><small>지방</small><strong>약 ${nutr.fat}g/인</strong></div><div class="detail-kpi"><small>총 에너지</small><strong>약 ${nutr.kcal}kcal/인</strong></div></div><p class="caption">영양 값은 일부 일반 식품 참고 성분을 환산한 개략 추정치입니다. 실제 브랜드 영양표·양념·흡유량·1인 실섭취량을 정밀 반영하지 않으므로 의료·식이 처방이나 정확한 섭취량 기록에 사용하지 마세요.</p>`;
+ ${nutritionHTML(nutr)}<div class="recipe-pantry"><b>기본 상차림:</b> ${esc(mealReadyCourse(meal))}. 이 외의 국과 반찬은 자동으로 준비되어 있다고 보지 않습니다. 아래에 나오는 조리법의 음식은 모두 실제로 만들어야 합니다.</div>
+ ${(meal.courses||[]).map((c,j)=>`<section class="recipe-course"><h3>${j+1}. ${esc(c.title)} <span class="tag neutral">별도 조리 ${c.minutes}분</span></h3><h4>재료 (${meal.servings}인분)</h4><ul>${c.ingredients.map(x=>`<li>${esc(x.name)}: ${Math.round(x.qty*ingredientScale(meal)*100)/100}${esc(x.unit)}</li>`).join('')}</ul><div class="season-block"><b>양념 계량</b><ul>${c.seasonings?.length?c.seasonings.map(x=>`<li>${esc(x.name)} ${Math.round(x.qty*ingredientScale(meal)*100)/100}${esc(x.unit)}</li>`).join(''):'<li>별도 양념 없음</li>'}</ul><small>재료 양과 염도에 따라 간을 마지막에 조절하세요. 큰술은 15ml, 작은술은 5ml 기준입니다.</small></div><h4>조리 순서</h4><ol>${c.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></section>`).join('')}
+ <div class="mini-divider"></div><div class="detail-grid"><div class="detail-kpi"><small>탄수화물</small><strong>약 ${nutr.carbs}g/인</strong></div><div class="detail-kpi"><small>단백질</small><strong>약 ${nutr.protein}g/인</strong></div><div class="detail-kpi"><small>지방</small><strong>약 ${nutr.fat}g/인</strong></div><div class="detail-kpi"><small>총 에너지</small><strong>약 ${nutr.kcal}kcal/인</strong></div></div><p class="caption">영양 값은 앱에 포함된 일반 식품 참고 성분의 추정치입니다. 미반영 재료: ${esc(nutr.unknown?.join(", ")||"없음")}. 탄수화물 비중 65% 초과 안내는 하루 에너지 적정비율을 참고한 한 끼 점검이며, 개인별 권장량이나 진단은 아닙니다. <a href="https://www.kns.or.kr/fileroom/fileroom_view.asp?BoardID=Kdr&amp;idx=168" target="_blank" rel="noopener">기준 설명</a>. 실제 브랜드 영양표·양념·흡유량·1인 실섭취량을 정밀 반영하지 않으므로 의료·식이 처방이나 정확한 섭취량 기록에 사용하지 마세요.</p>`;
 }
 function openModal(id){const d=$('#'+id);if(!d.open)d.showModal();}
 function closeModal(id){const d=$('#'+id);if(d.open)d.close();}
 function resetInventoryForm(){
- $('#inventoryForm').reset();$('#inventoryId').value='';$('#inventoryDialogTitle').textContent='식재료 등록';$('#invBoughtAt').value=dlocal();$('#invUnit').value='g';$('#invStorage').value='냉장';$('#invCategory').value=CATEGORIES[0];$('#invCategory').dataset.touched='';$('#invPhotoPreview').innerHTML='';$('#inventoryError').textContent='';
+ $('#inventoryForm').reset();$('#inventoryId').value='';$('#inventoryDialogTitle').textContent='식재료 등록';$('#invBoughtAt').value=dlocal();$('#invUnit').value='g';$('#invStorage').value='냉장';$('#invCategory').value=CATEGORIES[0];$('#invCategory').dataset.touched='';$('#inventoryError').textContent='';
 }
-function openInventory(id=null){resetInventoryForm();if(id){const x=state.inventory.find(r=>r.id===id);if(!x)return;$('#inventoryDialogTitle').textContent='식재료 수정';$('#inventoryId').value=x.id;$('#invName').value=x.name;$('#invQty').value=x.qty;$('#invUnit').value=x.unit;$('#invUnitGrams').value=x.unitGrams||'';$('#invCategory').value=x.category;$('#invStorage').value=x.storage;$('#invBoughtAt').value=x.boughtAt||'';$('#invExpiry').value=x.expiryDate||'';$('#invNotes').value=x.notes||'';if(x.photoURL)$('#invPhotoPreview').innerHTML=`<img src="${esc(x.photoURL)}" alt="현재 식재료 사진" style="max-width:100%;max-height:130px;border-radius:10px;margin-top:10px">`;}
+function openInventory(id=null){resetInventoryForm();if(id){const x=state.inventory.find(r=>r.id===id);if(!x)return;$('#inventoryDialogTitle').textContent='식재료 수정';$('#inventoryId').value=x.id;$('#invName').value=x.name;$('#invQty').value=x.qty;$('#invUnit').value=x.unit;$('#invUnitGrams').value=x.unitGrams||'';$('#invCategory').value=x.category;$('#invStorage').value=x.storage;$('#invBoughtAt').value=x.boughtAt||'';$('#invExpiry').value=x.expiryDate||'';$('#invNotes').value=x.notes||'';}
  openModal('inventoryDialog');
 }
-async function resizePhoto(file){
- if(file.size>12_000_000)throw Error('12MB 미만의 이미지만 선택해 주세요.');
- return new Promise((resolve,reject)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{try{const max=1200,scale=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(blob=>{URL.revokeObjectURL(url);blob?resolve(blob):reject(new Error('이미지 변환 실패'));},'image/jpeg',.78);}catch(e){URL.revokeObjectURL(url);reject(e);}};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('사진을 읽지 못했습니다.'));};img.src=url;});
-}
-async function storeInventoryPhoto(itemId,file){if(state.mode!=='cloud'||!storage||!fb?.storage)throw Error('사진 저장은 Firebase 로그인과 Storage 활성화 후 이용할 수 있습니다.');const blob=await resizePhoto(file);const path='users/'+state.user.uid+'/inventory/'+itemId+'/photo_'+Date.now()+'.jpg';const ref=fb.storage.ref(storage,path);await fb.storage.uploadBytes(ref,blob,{contentType:'image/jpeg'});const url=await fb.storage.getDownloadURL(ref);return {photoURL:url,photoPath:path};}
+
 function guessCategory(name){const n=normalizedName(name);if(['닭고기','돼지고기'].includes(n))return '육류';if(n==='고등어')return '생선·해산물';if(['달걀','두부'].includes(n))return '달걀·콩류';if(['참치','만두','어묵'].includes(n))return '냉동·가공품';if(['감자','당근','양파','대파','양배추','청경채','콩나물','시금치','무','오이','애호박'].includes(n))return '채소';if(['소면','파스타면','밥'].includes(n))return '곡물·면';return '기타';}
 async function saveInventoryForm(ev){ev.preventDefault();$('#inventoryError').textContent='';const id=$('#inventoryId').value||createUID();const name=$('#invName').value.trim(),qty=Number($('#invQty').value),unit=$('#invUnit').value,existing=state.inventory.find(x=>x.id===id);
  if(!name||!Number.isFinite(qty)||qty<0){$('#inventoryError').textContent='이름과 실제 수량을 확인해 주세요.';return;}
  const record={id,name,qty,initialQty:existing?.initialQty??qty,unit,unitGrams:$('#invUnitGrams').value?Number($('#invUnitGrams').value):null,category:$('#invCategory').value,storage:$('#invStorage').value,boughtAt:$('#invBoughtAt').value||'',expiryDate:$('#invExpiry').value||'',notes:$('#invNotes').value.trim(),source:existing?.source||'manual',purchaseId:existing?.purchaseId||null,photoURL:existing?.photoURL||'',photoPath:existing?.photoPath||''};
  const btn=$('#saveInventory');btn.disabled=true;
- try{await upsert('inventory',record);const photo=$('#invPhoto').files?.[0];if(photo){try{const details=await storeInventoryPhoto(id,photo);await upsert('inventory',{...record,...details});}catch(e){toast('재고는 저장됐지만 사진은 저장하지 못했습니다: '+parseAuthError(e));}}
+ try{await upsert('inventory',record);
   if(!existing)await addEvent('created',record,qty,'직접 등록');closeModal('inventoryDialog');toast('식재료 저장 완료');}
  catch(e){$('#inventoryError').textContent=parseAuthError(e);}finally{btn.disabled=false;}
 }
@@ -411,33 +441,22 @@ async function cancelPurchase(id){const p=state.purchases.find(x=>x.id===id);if(
 }
 function openWish(item=null){$('#wishForm').reset();$('#wishQty').value=1;$('#wishUnit').value='g';if(item){$('#wishName').value=item.name||'';$('#wishQty').value=item.qty||1;$('#wishUnit').value=item.unit||'g';}openModal('wishlistDialog');}
 async function saveWish(ev){ev.preventDefault();const name=$('#wishName').value.trim(),qty=Number($('#wishQty').value);if(!name||qty<=0)return;try{await upsert('wishlist',{name,qty,unit:$('#wishUnit').value,estimate:$('#wishEstimate').value===''?null:Number($('#wishEstimate').value),createdAt:new Date().toISOString()});closeModal('wishlistDialog');toast('장보기 예정 목록에 추가했습니다.');}catch(e){toast(parseAuthError(e));}}
-async function createPlan(){const date=$('#planDate').value,maxMinutes=Number($('#planTime').value),servings=Number($('#planServings').value);
- if(!date){toast('식단 시작 날짜를 선택하세요.');return;}
- const empty=state.inventory.filter(x=>Number(x.qty)>0);
- if(!empty.length&&!confirm('현재 입력된 식재료가 없습니다. 재고가 없는 상태로 식단을 만들면 대부분의 재료가 구매 필요로 표시됩니다. 계속할까요?'))return;
- const old=planFor(date);if(old&&!confirm('해당 주의 저장된 식단을 새 추천으로 교체할까요? 기존 식단이 덮어써집니다.'))return;
- const result=generateWeek({inventory:state.inventory,servings,maxMinutes,startDate:date,seed:Date.now()%1000});
- try{await upsert('plans',result);toast('7일 식단을 만들었습니다. 부족 재료를 확인하세요.');renderPlans();}catch(e){toast(parseAuthError(e));}
+function mealTarget(){
+ const date=$('#mealDate').value,slot=$('#mealSlot').value,servings=Number($('#planServings').value),maxMinutes=Number($('#planTime').value);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T12:00:00'))||!['아침','점심','저녁'].includes(slot)||!Number.isInteger(servings)||servings<1||servings>4)throw Error('날짜·끼니·인원을 확인해 주세요.');
+ const shown=planFor(),startDate=shown?.days.some(d=>d.date===date)?shown.id:weekStart(date);
+ return {date,slot,servings,maxMinutes,startDate,style:$('#planStyle').value};
 }
-async function changeMeal(date,slot){const start=$('#planDate').value,p=planFor(start);if(!p)return;
- const next=replaceOneMeal(p,date,slot,state.inventory,{seed:(Date.now()%4)+1});
- if(next.days.find(d=>d.date===date)?.meals.find(m=>m.slot===slot)?.title===p.days.find(d=>d.date===date)?.meals.find(m=>m.slot===slot)?.title){toast('다른 메뉴를 찾지 못했습니다.');return;}
- // Regenerate shortage totals for all meals against current inventory to prevent stale existing shortage counts.
- const stockCounts=new Map();for(const inv of state.inventory){const key=normalizedName(inv.name)+'|'+inv.unit;stockCounts.set(key,(stockCounts.get(key)||0)+Number(inv.qty));}
- const shortages=new Map();
- for(const day of next.days){for(const m of day.meals){const missing=[];
- for(const item of requiredItems(m)){
-  const normal=normalizedName(item.name);let stock=0;let key=null;
-  for(const [k,v] of stockCounts.entries()){const [name,unit]=k.split('|');if(name!==normal)continue;if(unit===item.unit){key=k;stock=v;break;}if((unit==='kg'&&item.unit==='g')||(unit==='g'&&item.unit==='kg')){key=k;stock=unit==='kg'?v*1000:v/1000;break;}}
-  const needed=item.qty*(Number(next.servings)||2)/2,take=Math.min(stock,needed),remain=Math.round((needed-take)*100)/100;
-  if(key){const kUnit=key.split('|')[1];stockCounts.set(key,Math.max(0,stockCounts.get(key)-(kUnit==='kg'&&item.unit==='g'?take/1000:kUnit==='g'&&item.unit==='kg'?take*1000:take)));}
-  if(remain>0){const shortage={name:item.name,qty:remain,unit:item.unit};missing.push(shortage);const k=normal+'|'+item.unit;const s=shortages.get(k)||{...shortage,qty:0};s.qty+=remain;shortages.set(k,s);}
- }m.missing=missing;m.nutrition=nutritionEstimate(m,next.servings);
- }}
- next.missing=[...shortages.values()];
- try{await upsert('plans',next);toast('해당 한 끼를 교체했습니다. 다른 끼니와 부족 재료도 다시 계산했습니다.');}catch(e){toast(parseAuthError(e));}
+function createPlan(){
+ try{const target=mealTarget(),stock=inventoryTotals(state.inventory);
+ const ranked=RECIPES.filter(r=>r.role!=='side'&&r.slots.includes(target.slot)).map(r=>({r,score:r.ingredients.filter(x=>stock.some(v=>v.normalized===normalizedName(x.name))).length*10-Math.max(0,r.minutes-target.maxMinutes)})).sort((a,b)=>b.score-a.score);
+ const menus=ranked.slice(0,6).map(({r})=>{const m=buildMeal(structuredClone(r),null,target.servings);m.nutrition=nutritionEstimate(m);return m;});
+ showMealCandidates(menus,target);
+ }catch(e){notice(parseAuthError(e));}
 }
-async function addMissing(){const p=planFor();if(!p)return;const missing=p.missing||[];if(!missing.length){toast('추가 구매가 필요한 재료가 없습니다.');return;}
+function changeMeal(date,slot){$('#mealDate').value=date;$('#mealSlot').value=slot;navigate('planner');toast('날짜와 끼니를 선택했습니다. AI 추천 또는 내장 메뉴에서 골라 주세요.');$('#aiPlan').focus();}
+
+async function addMissing(){const p=planFor();if(!p)return;const missing=recalculatePlan(p,state.inventory).missing||[];if(!missing.length){toast('추가 구매가 필요한 재료가 없습니다.');return;}
  const add=missing.filter(x=>!state.wishlist.some(w=>normalizedName(w.name)===normalizedName(x.name)));
  if(!add.length){toast('부족 재료가 이미 장보기 예정 목록에 있습니다.');navigate('shopping');return;}
  if(!confirm(add.length+'종의 부족 재료를 가격 미확인 상태로 장보기 예정 목록에 추가할까요? 실제로 결제된 비용이 아닙니다.'))return;
@@ -448,49 +467,49 @@ async function addMissing(){const p=planFor();if(!p)return;const missing=p.missi
  }catch(e){toast(parseAuthError(e));}
 }
 let pendingAiPlan=null;
-function previewAiPlan(plan,user){
- if(state.mode!=='cloud'||state.user?.uid!==user)throw Error('로그인 계정이 변경됐습니다. 다시 요청해 주세요.');
- pendingAiPlan={plan,user};$('#aiPlanReviewError').textContent='';
- $('#aiPlanReviewContent').innerHTML=plan.days.map(day=>`<section><h3>${esc(day.date)}</h3>${day.meals.map(meal=>`<details><summary>${esc(meal.slot)} · ${esc(meal.title)} · ${Math.round(meal.minutes)}분</summary>${recipeHTML(meal)}</details>`).join('')}</section>`).join('');
+function normalizeMealOption(m,servings){
+ const item=x=>{const qty=Number(x.qty),name=String(x.name||'').trim(),unit=String(x.unit||'');if(!name||!Number.isFinite(qty)||qty<=0||qty>10000||!UNIT_OPTIONS.includes(unit))throw Error('재료 수량이나 단위를 확인할 수 없습니다. 다시 추천해 주세요.');return {name:name.slice(0,60),qty,unit};};
+ if(!Array.isArray(m.courses)||!m.courses.length||m.courses.length>2)throw Error('조리법을 확인할 수 없습니다.');
+ const courses=m.courses.map(c=>{if(!Array.isArray(c.ingredients)||!c.ingredients.length||!Array.isArray(c.seasonings)||!Array.isArray(c.steps)||!c.steps.length)throw Error('조리법이 빠진 메뉴입니다.');return {id:'ai_'+createUID(),title:String(c.title||m.title).slice(0,100),role:['main','soup','side','bowl'].includes(c.role)?c.role:'main',minutes:Math.max(1,Math.min(180,Number(c.minutes)||20)),requiresRice:c.requiresRice===true,ingredients:c.ingredients.slice(0,30).map(item),seasonings:c.seasonings.slice(0,20).map(item),steps:c.steps.slice(0,8).map(x=>String(x).slice(0,600))};});
+ const meal={id:createUID(),title:String(m.title||courses[0].title).slice(0,100),courses,servings,amountBasis:'servings',minutes:courses.reduce((n,c)=>n+c.minutes,0),source:'AI 한 끼 추천',missing:[]};meal.nutrition=nutritionEstimate(meal);return meal;
+}
+function showMealCandidates(meals,target){
+ if(!meals.length)throw Error('추천 가능한 메뉴가 없습니다.');
+ pendingAiPlan={meals,target,user:state.user?.uid||null,mode:state.mode,selected:null};
+ $('#saveAiPlan').disabled=true;$('#aiPlanReviewError').textContent='';$('#selectedMealNutrition').innerHTML='';
+ $('#aiPlanReviewTarget').textContent=target.date+' '+target.slot+' · '+target.servings+'인분 · 다른 끼니는 유지됩니다.';
+ $('#aiPlanReviewContent').innerHTML=meals.map((meal,i)=>`<article class="panel"><label class="check-row"><input type="radio" name="mealChoice" value="${i}"><strong>${esc(meal.title)}</strong></label>${nutritionHTML(nutritionEstimate(meal))}${meal.minutes>target.maxMinutes?'<p class="caption">선택한 조리시간을 초과합니다.</p>':''}<details><summary>재료·조리법 보기</summary>${recipeHTML(meal)}</details></article>`).join('');
  openModal('aiPlanReviewDialog');
 }
+function selectMealCandidate(index){
+ if(!pendingAiPlan||!Number.isInteger(index)||!pendingAiPlan.meals[index])return;pendingAiPlan.selected=index;
+ const m=pendingAiPlan.meals[index];$('#selectedMealNutrition').innerHTML='<strong>선택: '+esc(m.title)+'</strong>'+nutritionHTML(nutritionEstimate(m));$('#saveAiPlan').disabled=false;
+}
 async function saveReviewedAiPlan(){
- const draft=pendingAiPlan,button=$('#saveAiPlan');if(!draft||button.disabled)return;
- if(state.mode!=='cloud'||state.user?.uid!==draft.user){$('#aiPlanReviewError').textContent='로그인 계정이 변경되어 저장하지 않았습니다.';return;}
+ const draft=pendingAiPlan,button=$('#saveAiPlan');if(!draft||draft.selected===null||button.disabled)return;
+ if(state.mode!==draft.mode||(state.user?.uid||null)!==draft.user){$('#aiPlanReviewError').textContent='로그인 계정이 변경되어 저장하지 않았습니다.';return;}
  button.disabled=true;
- try{await upsert('plans',draft.plan);pendingAiPlan=null;closeModal('aiPlanReviewDialog');toast('검토한 AI 식단을 저장했습니다.');}
- catch(e){$('#aiPlanReviewError').textContent=parseAuthError(e);}
+ try{
+  const meal=draft.meals[draft.selected],target=draft.target;let next;
+  if(state.mode==='cloud'){
+   const ref=ownRef('plans',target.startDate);
+   next=await fb.firestore.runTransaction(db,async tx=>{const snap=await tx.get(ref),existing=snap.exists()?{...snap.data(),id:target.startDate}:null;const updated=mergeMealIntoPlan(existing,target,meal,state.inventory);tx.set(ref,updated);return updated;});
+   const i=state.plans.findIndex(x=>x.id===next.id);if(i<0)state.plans.push(next);else state.plans[i]=next;
+  }else{next=mergeMealIntoPlan(planFor(target.startDate),target,meal,state.inventory);await upsert('plans',next);}
+  pendingAiPlan=null;closeModal('aiPlanReviewDialog');$('#planDate').value=target.startDate;renderAll();toast(target.date+' '+target.slot+'에 선택한 메뉴를 반영했습니다.');
+ }catch(e){$('#aiPlanReviewError').textContent=parseAuthError(e);}
  finally{button.disabled=false;}
 }
-async function aiMealPlan(){if(state.mode!=='cloud'||!functions||!fb?.functions){notice('AI 식단을 만들려면 Firebase 로그인과 Cloud Functions 배포가 필요합니다. 현재는 검증된 로컬 레시피를 활용할 수 있습니다.');return;}
- const requestUser=state.user?.uid;
- const date=$('#planDate').value;
- const payload={startDate:date,servings:Number($('#planServings').value),maxMinutes:Number($('#planTime').value),style:$('#planStyle').value};
- $('#aiPlan').disabled=true;$('#aiPlan').textContent='AI 요청 중…';
- // Allow the deployed function's 240-second deadline plus network overhead.
- try{const callable=fb.functions.httpsCallable(functions,'suggestMeals',{timeout:270000});const result=await callable(payload);const plan=result?.data?.plan;
- if(!plan||!Array.isArray(plan.days)||plan.days.length!==7)throw Error('AI 응답 구조가 올바르지 않습니다.');
- // Receiving an AI response only opens a preview. A separate user action saves it.
- const clean=normalizeAiPlan(plan,date,payload.servings,payload.maxMinutes);
- previewAiPlan(clean,requestUser);
- }catch(e){notice('AI 추천은 아직 Cloud Functions/OpenAI 서버 배포가 완료되지 않았거나 요청에 실패했습니다. 기본 식단 만들기는 별도 API 없이 이용할 수 있습니다. ('+parseAuthError(e)+')');}
- finally{$('#aiPlan').disabled=false;$('#aiPlan').textContent='AI로 자세한 식단 추천';}
-}
-function normalizeAiPlan(plan,date,servings,maxMinutes){
- if(!Array.isArray(plan.days)||plan.days.length!==7)throw Error('응답 데이터 오류');
- const days=plan.days.map((d,i)=>{
-  if(!Array.isArray(d.meals)||d.meals.length!==3)throw Error('하루 3끼가 아닙니다.');
-  return {date:plusDays(date,i),meals:d.meals.map((m,j)=>{
-   const courses=(m.courses||[]).slice(0,4).map(c=>({id:'ai_'+createUID(),title:String(c.title||'메뉴').slice(0,75),role:String(c.role||'main').slice(0,12),requiresRice:c.requiresRice!==false,minutes:Math.min(120,Math.max(5,Number(c.minutes)||20)),ingredients:(c.ingredients||[]).slice(0,35).map(x=>({name:String(x.name||'').slice(0,60),qty:Math.min(10000,Number(x.qty)||0),unit:String(x.unit||'g').slice(0,8)})),seasonings:(c.seasonings||[]).slice(0,25).map(x=>({name:String(x.name||'').slice(0,60),qty:Math.min(1000,Number(x.qty)||0),unit:String(x.unit||'g').slice(0,8)})),steps:(c.steps||[]).slice(0,20).map(x=>String(x).slice(0,500))}));
-   if(courses.length===0)throw Error('조리법이 빠진 메뉴가 있습니다.');const meal={id:createUID(),slot:['아침','점심','저녁'][j],title:String(m.title||courses[0].title).slice(0,100),courses,servings,minutes:courses.reduce((s,c)=>s+c.minutes,0),missing:Array.isArray(m.missing)?m.missing.slice(0,20):[],source:'AI 제안 · 확인 필요'};meal.nutrition=nutritionEstimate(meal,servings);return meal;
-  })};
- });const shortages=new Map();
- for(const day of days)for(const meal of day.meals)for(const item of meal.missing){
-  const qty=Number(item.qty);if(!item.name||!Number.isFinite(qty)||qty<=0)continue;
-  const key=normalizedName(item.name)+'|'+String(item.unit||'');const previous=shortages.get(key);
-  if(previous)previous.qty+=qty;else shortages.set(key,{name:String(item.name),qty,unit:String(item.unit||'')});
- }
- return {id:date,startDate:date,servings,maxMinutes,days,missing:[...shortages.values()],source:'AI 미검증 제안',createdAt:new Date().toISOString()};
+async function aiMealPlan(){
+ if(state.mode!=='cloud'||!functions||!fb?.functions){notice('AI 추천은 로그인 후 이용할 수 있습니다. 내장 메뉴는 바로 고를 수 있습니다.');return;}
+ let target;try{target=mealTarget();}catch(e){notice(parseAuthError(e));return;}
+ const requestUser=state.user?.uid;$('#aiPlan').disabled=true;$('#aiPlan').textContent='한 끼 후보 만드는 중…';
+ try{const result=await fb.functions.httpsCallable(functions,'suggestMeals',{timeout:270000})({mode:'single',...target});
+  if(state.mode!=='cloud'||state.user?.uid!==requestUser)throw Error('로그인 계정이 변경되어 추천을 닫았습니다.');
+  if(!Array.isArray(result.data?.meals)||result.data.meals.length!==3)throw Error('한 끼 후보를 받지 못했습니다.');
+  showMealCandidates(result.data.meals.map(m=>normalizeMealOption(m,target.servings)),target);
+ }catch(e){notice('한 끼 추천에 실패했습니다. '+parseAuthError(e));}
+ finally{$('#aiPlan').disabled=false;$('#aiPlan').textContent='AI 한 끼 메뉴 3개 추천';}
 }
 async function saveSettings(ev){ev.preventDefault();const n=Number($('#budgetInput').value);if(!Number.isSafeInteger(n)||n<10000||n>10000000){toast('예산은 1만 원 이상, 1천만 원 이하로 입력하세요.');return;}
  try{if(state.mode==='cloud')await fb.firestore.setDoc(ownRef('settings','profile'),{budget:n},{merge:true});else{state.settings.budget=n;saveLocal();renderAll();}toast('주간 예산을 저장했습니다.');}catch(e){toast(parseAuthError(e));}
@@ -519,21 +538,7 @@ async function importOldExpenses(){const old=safeLocalGet('meal_real_expenses_v1
  }else{for(const x of rows)state.purchases.push({id:'old_'+String(x.id).replace(/[^\w-]/g,'_').slice(0,70),legacyId:x.id,name:x.name,date:x.date,cost:Number(x.cost),qty:1,unit:'개',store:x.store||'',category:'기타',source:'meal-v1-import'});saveLocal();renderAll();}
  toast('이전 지출 '+rows.length+'건을 가져왔습니다. 가격은 원본 실결제 기록 그대로입니다.');
  }catch(e){toast('이전 기록 복원 오류: '+parseAuthError(e));}}
-let photoCandidates=[];
-async function analyzePhotoFiles(files){
- const arr=[...files||[]].slice(0,3);if(!arr.length)return;
- if(state.mode!=='cloud'||!fb?.functions||!functions){toast('사진 AI 분석은 Firebase 로그인과 Cloud Functions/OpenAI 서버 배포 후 사용할 수 있습니다. 현재는 직접 등록하거나 식재료 사진을 첨부할 수 있습니다.');return;}
- $('#analyzePhotosBtn').disabled=true;$('#analyzePhotosBtn').textContent='사진 분석 중…';
- try{
-  const images=[];for(const file of arr){const blob=await resizePhoto(file);const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('이미지 변환 실패'));reader.readAsDataURL(blob);});if(String(dataUrl).length>2_500_000)throw Error('이미지가 너무 큽니다.');images.push(dataUrl);}
-  const res=await fb.functions.httpsCallable(functions,'analyzeInventoryPhoto',{timeout:270000})({images});
-  const candidates=res.data?.items;if(!Array.isArray(candidates))throw Error('AI 응답의 식재료 목록을 읽지 못했습니다.');
-  photoCandidates=candidates.filter(x=>x.name&&typeof x.name==='string').slice(0,30);
-  $('#photoCandidates').innerHTML=photoCandidates.length?photoCandidates.map((x,i)=>`<div class="list-row"><div class="row-info"><strong>${esc(x.name)}</strong><small>추정 수량 ${x.qty==null?'확인 필요':esc(x.qty)+' '+esc(x.unit||'')} · 확신도 ${esc(x.confidence||'알 수 없음')}</small></div><button class="tiny-button" data-photo-pick="${i}">이 재료 등록</button></div>`).join(''):'<div class="empty">명확하게 식별한 재료가 없습니다. 직접 등록을 이용해 주세요.</div>';
-  $('#photoAnalyzeMessage').textContent='';openModal('photoReviewDialog');
- }catch(e){toast('사진 분석을 완료하지 못했습니다: '+parseAuthError(e)+' · Functions 배포 상태를 확인해 주세요.');}
- finally{$('#analyzePhotosBtn').disabled=false;$('#analyzePhotosBtn').textContent='📷 사진에서 재료 후보 추출';$('#analyzePhotosInput').value='';}
-}
+
 function showRecipe(date,slot){const p=planFor();const meal=p?.days.find(d=>d.date===date)?.meals.find(m=>m.slot===slot);if(!meal)return;$('#recipeTitle').textContent=slot+' · '+meal.title;$('#recipeDetail').innerHTML=recipeHTML(meal);openModal('recipeDialog');}
 function savePurchaseCsv(){const header=['구매일','상품명','실제금액(원)','수량','단위','구매처','재고입고'];const rows=state.purchases.map(x=>[x.date,x.name,x.cost,x.qty,x.unit,x.store||'',x.inventoryId?'입고':'미입고']);download('Meal_실제구매_'+dlocal()+'.csv','\uFEFF'+[header,...rows].map(a=>a.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8');}
 async function attemptAuth(signup=false){if(!auth||!fb?.auth){$('#authError').textContent='Firebase SDK를 사용할 수 없습니다. 인터넷 연결을 확인하거나 기기 모드로 시작해 주세요.';return;}
@@ -576,7 +581,8 @@ function attachHandlers(){
  $('#signUp').addEventListener('click',()=>attemptAuth(true));$('#signGoogle').addEventListener('click',googleAuth);$('#useLocalMode').addEventListener('click',useLocal);
  $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
  $$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close();}));
- $('#newInventory').addEventListener('click',()=>openInventory());$('#invName').addEventListener('input',()=>{if(!$('#invCategory').dataset.touched)$('#invCategory').value=guessCategory($('#invName').value);});$('#invCategory').addEventListener('change',()=>{$('#invCategory').dataset.touched='yes';});$('#purName').addEventListener('input',()=>{if(!$('#purCategory').dataset.touched)$('#purCategory').value=guessCategory($('#purName').value);});$('#purCategory').addEventListener('change',()=>{$('#purCategory').dataset.touched='yes';});$('#analyzePhotosBtn').addEventListener('click',()=>$('#analyzePhotosInput').click());$('#analyzePhotosInput').addEventListener('change',e=>analyzePhotoFiles(e.target.files));$('#photoCandidates').addEventListener('click',e=>{const b=e.target.closest('button[data-photo-pick]');if(!b)return;const x=photoCandidates[Number(b.dataset.photoPick)];if(!x)return;closeModal('photoReviewDialog');openInventory();$('#invName').value=x.name;$('#invQty').value=x.qty??'';if(UNIT_OPTIONS.includes(x.unit))$('#invUnit').value=x.unit;$('#invCategory').value=guessCategory(x.name);toast('사진 후보를 불러왔습니다. 실제 수량과 소비기한을 확인하고 저장해 주세요.');});$('#inventoryForm').addEventListener('submit',saveInventoryForm);
+ $('#newInventory').addEventListener('click',()=>openInventory());$('#invName').addEventListener('input',()=>{if(!$('#invCategory').dataset.touched)$('#invCategory').value=guessCategory($('#invName').value);});$('#invCategory').addEventListener('change',()=>{$('#invCategory').dataset.touched='yes';});$('#purName').addEventListener('input',()=>{if(!$('#purCategory').dataset.touched)$('#purCategory').value=guessCategory($('#purName').value);});$('#purCategory').addEventListener('change',()=>{$('#purCategory').dataset.touched='yes';});
+$('#inventoryForm').addEventListener('submit',saveInventoryForm);
  ['stockSearch','stockStorage','stockCategory'].forEach(id=>$('#'+id).addEventListener(id==='stockSearch'?'input':'change',renderInventory));
  $('#stockList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.editStock)openInventory(b.dataset.editStock);if(b.dataset.use)openAdjust(b.dataset.use);if(b.dataset.delStock)deleteInventory(b.dataset.delStock);});
  $('#adjustForm').addEventListener('submit',saveAdjust);
@@ -585,15 +591,15 @@ function attachHandlers(){
  $('#wishList').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{if(b.dataset.buyWish)openPurchase(b.dataset.buyWish);if(b.dataset.delWish&&confirm('이 구매 예정 품목을 삭제할까요?'))await erase('wishlist',b.dataset.delWish);}catch(err){toast(parseAuthError(err));}});
  $('#purchaseList').addEventListener('click',e=>{const b=e.target.closest('button');if(b?.dataset.cancelPurchase)cancelPurchase(b.dataset.cancelPurchase);});
  $('#exportPurchases').addEventListener('click',savePurchaseCsv);
- $('#createPlan').addEventListener('click',createPlan);$('#aiPlan').addEventListener('click',aiMealPlan);$('#saveAiPlan').addEventListener('click',saveReviewedAiPlan);$('#aiPlanReviewDialog').addEventListener('close',()=>{pendingAiPlan=null;});
- $('#planDate').addEventListener('change',renderPlans);
+ $('#createPlan').addEventListener('click',createPlan);$('#aiPlan').addEventListener('click',aiMealPlan);$('#saveAiPlan').addEventListener('click',saveReviewedAiPlan);$('#aiPlanReviewDialog').addEventListener('close',()=>{pendingAiPlan=null;});$('#aiPlanReviewContent').addEventListener('change',e=>{if(e.target.name==='mealChoice')selectMealCandidate(Number(e.target.value));});$('#mealDate').addEventListener('change',()=>{if($('#mealDate').value){$('#planDate').value=weekStart($('#mealDate').value);renderPlans();}});
+ $('#planDate').addEventListener('change',()=>{if($('#planDate').value){$('#planDate').value=weekStart($('#planDate').value);renderPlans();}});
  $('#weeklyPlan').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.showRecipe){const [date,slot]=b.dataset.showRecipe.split('|');showRecipe(date,slot);}else if(b.dataset.replaceMeal){const [date,slot]=b.dataset.replaceMeal.split('|');changeMeal(date,slot);}});
  $('#addMissingToWish').addEventListener('click',addMissing);
  $('#settingsForm').addEventListener('submit',saveSettings);
  $('#firebaseTest').addEventListener('click',testFirebaseConnection);$('#exportBackup').addEventListener('click',backup);$('#importBackupFile').addEventListener('change',async e=>{await restoreBackup(e.target.files?.[0]);e.target.value='';});
  $('#importOldExpenses').addEventListener('click',importOldExpenses);
  $('#homeActionBtn').addEventListener('click',e=>navigate(e.target.dataset.target||'inventory'));
- $('#weekendPlanBtn').addEventListener('click',()=>{const next=plusDays(weekStart(dlocal()),7);$('#planDate').value=next;navigate('planner');});
+ $('#weekendPlanBtn').addEventListener('click',()=>{const next=plusDays(weekStart(dlocal()),7);$('#planDate').value=next;$('#mealDate').value=next;navigate('planner');});
 }
 initStatic();attachHandlers();renderAll();initFirebase();
 // TEST HOOK (no privileged state mutations): can be inspected in headless browser tests.

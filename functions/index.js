@@ -58,7 +58,7 @@ exports.suggestMeals=onCall(OPTIONS,async req=>{
   if(!/^\d{4}-\d{2}-\d{2}$/.test(arg.startDate||'')||!Number.isInteger(servings)||servings<1||servings>4)
     throw new HttpsError('invalid-argument','시작일과 인원 수를 확인해 주세요.');
   const maxMinutes=Math.max(15,Math.min(70,safeNumber(arg.maxMinutes,35)));
-  await quota(user,'planCalls',2);
+  // Meal planning is user-triggered and has no application-level daily quota.
   try{
     const [stock,buy,settings]=await Promise.all([
       db.collection('users/'+user+'/inventory').limit(150).get(),

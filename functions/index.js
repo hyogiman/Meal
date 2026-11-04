@@ -17,46 +17,24 @@ const COURSE={type:'object',additionalProperties:false,required:['title','role',
   title:{type:'string'},role:{type:'string',enum:['main','soup','side','bowl']},minutes:{type:'number'},
   requiresRice:{type:'boolean'},ingredients:{type:'array',items:U},seasonings:{type:'array',items:U},
   steps:{type:'array',items:{type:'string'}}}};
-const MEAL={type:'object',additionalProperties:false,required:['title','courses','missing'],properties:{
-  title:{type:'string'},courses:{type:'array',items:COURSE},missing:{type:'array',items:U}}};
-const PLAN={type:'object',additionalProperties:false,required:['days'],properties:{
-  days:{type:'array',items:{type:'object',additionalProperties:false,required:['meals'],properties:{meals:{type:'array',items:MEAL}}}}}};
-const PHOTO={type:'object',additionalProperties:false,required:['items','notes'],properties:{
-  items:{type:'array',items:{type:'object',additionalProperties:false,required:['name','qty','unit','category','confidence'],properties:{
-    name:{type:'string'},qty:{type:['number','null']},unit:{type:['string','null']},
-    category:{type:['string','null']},confidence:{type:'string',enum:['high','medium','low']}}}},
-  notes:{type:'string'}}};
+const MEAL={type:'object',additionalProperties:false,required:['title','courses'],properties:{
+  title:{type:'string'},courses:{type:'array',minItems:1,maxItems:2,items:COURSE}}};
+const SUGGESTIONS={type:'object',additionalProperties:false,required:['meals'],properties:{
+  meals:{type:'array',minItems:3,maxItems:3,items:MEAL}}};
 function uid(request){const id=request.auth?.uid;if(!id)throw new HttpsError('unauthenticated','Meal 로그인 후 이용해 주세요.');const allow=(ALLOWED.value()||'').split(',').map(s=>s.trim()).filter(Boolean);if(!allow.includes(id))throw new HttpsError('permission-denied','AI 기능은 등록된 가족 계정에서만 사용할 수 있습니다.');return id;}
-function localDay(){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const value=t=>parts.find(p=>p.type===t)?.value||'';return value('year')+'-'+value('month')+'-'+value('day');}
-async function quota(user,field,cap){
-  const ref=db.doc('users/'+user+'/usage/'+localDay());
-  await db.runTransaction(async t=>{
-    const x=await t.get(ref),count=Number(x.data()?.[field]||0);
-    if(count>=cap)throw new HttpsError('resource-exhausted','오늘의 AI 요청 한도에 도달했습니다.');
-    t.set(ref,{[field]:count+1},{merge:true});
-  });
-}
-function client(){const key=KEY.value();if(!key)throw new HttpsError('failed-precondition','Cloud Functions에 OPENAI_API_KEY 비밀키가 설정되지 않았습니다.');return new OpenAI({apiKey:key,timeout:190000,maxRetries:1});}
+function client(){const key=KEY.value();if(!key)throw new HttpsError('failed-precondition','Cloud Functions에 OPENAI_API_KEY 비밀키가 설정되지 않았습니다.');return new OpenAI({apiKey:key,timeout:190000,maxRetries:0});}
 function safeNumber(n,def=0){const x=Number(n);return Number.isFinite(x)?x:def;}
 exports.analyzeInventoryPhoto=onCall(OPTIONS,async req=>{
-  const user=uid(req),images=req.data?.images;
-  if(!Array.isArray(images)||images.length<1||images.length>3)throw new HttpsError('invalid-argument','이미지는 1~3장까지 가능합니다.');
-  if(images.some(x=>typeof x!=='string'||x.length>2500000||!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x)))throw new HttpsError('invalid-argument','이미지 형식 또는 크기가 올바르지 않습니다.');
-  await quota(user,'photoCalls',5);
-  try{
-    const content=[{type:'input_text',text:'한국 가정의 냉장고·구매품 사진입니다. 사진에 보이는 품목만 반환하세요. 수량이나 라벨이 불확실하면 null을 사용하고 보이지 않는 물건을 추정하지 마세요. 인식 결과는 저장하지 않고 사용자가 먼저 검토합니다.'},
-      ...images.map(x=>({type:'input_image',image_url:x,detail:'low'}))];
-    const r=await client().responses.create({model:'gpt-6-luna',input:[{role:'user',content}],
-      text:{format:{type:'json_schema',name:'meal_inventory_candidates',strict:true,schema:PHOTO}},
-      max_output_tokens:2500,store:false});
-    const parsed=JSON.parse(r.output_text||'{}');
-    return {items:Array.isArray(parsed.items)?parsed.items.slice(0,30):[],notes:String(parsed.notes||'').slice(0,1000)};
-  }catch(e){console.error('Meal photo error',e?.status||e?.code||'unknown');throw new HttpsError('internal','사진 분석에 실패했습니다.');}
+  uid(req);
+  // Retired endpoint also protects cached clients from starting paid photo requests.
+  throw new HttpsError('failed-precondition','사진 기능은 종료했습니다. 재료를 직접 입력해 주세요.');
 });
 exports.suggestMeals=onCall(OPTIONS,async req=>{
   const user=uid(req),arg=req.data||{},servings=safeNumber(arg.servings);
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(arg.startDate||'')||!Number.isInteger(servings)||servings<1||servings>4)
-    throw new HttpsError('invalid-argument','시작일과 인원 수를 확인해 주세요.');
+  if(arg.mode!=='single')throw new HttpsError('failed-precondition','한 끼 추천으로 변경되었습니다. 페이지를 새로고침해 주세요.');
+  const date=typeof arg.date==='string'?arg.date:'';
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T12:00:00Z'))||new Date(date+'T12:00:00Z').toISOString().slice(0,10)!==date||!['아침','점심','저녁'].includes(arg.slot)||!Number.isInteger(servings)||servings<1||servings>4)
+    throw new HttpsError('invalid-argument','날짜, 끼니와 인원 수를 확인해 주세요.');
   const maxMinutes=Math.max(15,Math.min(70,safeNumber(arg.maxMinutes,35)));
   // Meal planning is user-triggered and has no application-level daily quota.
   try{
@@ -66,23 +44,25 @@ exports.suggestMeals=onCall(OPTIONS,async req=>{
       db.doc('users/'+user+'/settings/profile').get()]);
     const inventory=stock.docs.map(x=>x.data()).map(x=>({name:String(x.name||'').slice(0,80),qty:safeNumber(x.qty),unit:String(x.unit||''),unitGrams:safeNumber(x.unitGrams),expiryDate:String(x.expiryDate||'')})).filter(x=>x.qty>0);
     const wishlist=buy.docs.map(x=>x.data()).map(x=>({name:String(x.name||'').slice(0,80),qty:safeNumber(x.qty),unit:String(x.unit||''),estimate:x.estimate==null?null:safeNumber(x.estimate)}));
-    const prompt={startDate:arg.startDate,servings,maxMinutes,style:arg.style==='varied'?'익숙한 한국 가정식과 일부 면요리':'익숙한 한국 가정식',
+    const prompt={date,slot:arg.slot,servings,maxMinutes,style:arg.style==='lowcarb'?'밥·면에 치우치지 않고 단백질과 채소를 포함':arg.style==='varied'?'익숙한 한국 가정식과 일부 면요리':'익숙한 한국 가정식',
       inventory,wishlist,weeklyBudget:safeNumber(settings.data()?.budget,80000)};
     const rules=[
-      '한국 가정식 식단 생성기입니다. 7일 x 아침/점심/저녁 정확히 21끼를 JSON으로 작성하세요.',
+      '선택한 날짜의 한 끼를 위한 서로 다른 메뉴 후보 정확히 3개를 JSON meals 배열로 작성하세요. 주간 식단을 만들지 마세요.',
       '이미 만들어진 음식은 밥과 김치뿐입니다. 모든 추가 국/반찬/주찬은 별도의 course로 구성합니다.',
-      '각 course는 정확한 식재료 g/ml/개, 간장/설탕/마늘 등의 양념 배합, 실제 조리순서 4~7단계와 조리시간을 적으세요.',
+      '각 후보는 주찬 1개를 기본으로 하고 꼭 필요한 경우만 별도 국/반찬을 추가합니다. 각 course에 식재료, 양념, 간결한 조리순서 4단계와 조리시간을 적으세요.',
+      '재료·양념의 수량은 요청한 servings 전체 분량이며 가능한 g/ml를 사용하세요. 쌀밥을 별도로 곁들일 때만 requiresRice=true로 표시하세요. 밥이 재료에 들어가거나 국수/파스타인 경우 false입니다.',
       '한 끼 조리시간은 각 course minutes 합으로 계산하고 가능한 한 maxMinutes 이하여야 합니다.',
       '익숙한 김치찌개, 제육볶음, 만둣국, 계란국, 생선구이 등이 우선입니다. 생소한 미역만둣국 등은 만들지 마세요.',
-      '부족한 품목은 missing에 기록하고 가격을 지어내지 마세요. 재고를 주간 전체에서 중복 과다 사용하지 마세요.',
+      '재고를 우선 활용하고 가격과 영양 수치를 지어내지 마세요. 세 후보는 서로 대안이지 함께 먹는 식단이 아닙니다.',
       '상차림 구성을 위해 매번 국/반찬을 추가할 필요는 없습니다. 밥+주찬+김치도 가능합니다.',
       '모든 재료량은 지정된 식사 인원 전체 기준이며, 출처 없는 영양정보는 생성하지 마세요. 결과는 사용자 검토 전 초안입니다.'
     ].join('\n');
     const r=await client().responses.create({model:'gpt-6.1-terra',instructions:rules,
       input:[{role:'user',content:JSON.stringify(prompt)}],
-      text:{format:{type:'json_schema',name:'meal_family_week_plan',strict:true,schema:PLAN}},max_output_tokens:16000,store:false});
-    const plan=JSON.parse(r.output_text||'{}');
-    if(!Array.isArray(plan.days)||plan.days.length!==7||plan.days.some(x=>!Array.isArray(x.meals)||x.meals.length!==3))throw Error('meal plan structure invalid');
-    return {plan,disclaimer:'AI 제안은 가격 또는 영양성분 확정값이 아닙니다. 저장 전 실제 수량, 양념, 조리시간을 확인해 주세요.'};
+      text:{format:{type:'json_schema',name:'meal_single_options',strict:true,schema:SUGGESTIONS}},max_output_tokens:5000,store:false});
+    const result=JSON.parse(r.output_text||'{}');
+    if(r.status==='incomplete'||!Array.isArray(result.meals)||result.meals.length!==3||result.meals.some(m=>!Array.isArray(m.courses)||m.courses.length<1||m.courses.length>2))throw Error('meal options structure invalid');
+    return {meals:result.meals,disclaimer:'한 끼 후보입니다. 하나를 선택하고 재료·수량을 확인한 뒤 반영하세요.'};
   }catch(e){console.error('Meal plan error',e?.status||e?.code||'unknown');throw new HttpsError('internal','AI 식단 추천에 실패했습니다. 내장 레시피를 이용해 주세요.');}
 });
+

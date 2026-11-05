@@ -4,16 +4,16 @@
 - GitHub: https://github.com/hyogiman/Meal / main
 - 공개 프론트엔드: https://hyogiman.github.io/Meal/ (GitHub Pages)
 - Firebase 프로젝트: **mealplan-786a6** / Functions region **asia-northeast3**
-- OpenAI SDK API 모델: 사진 gpt-6-luna, 식단 gpt-6.1-terra
+- OpenAI SDK API 모델: 한 끼 메뉴 후보 gpt-6.1-terra. 사용자 요청으로 사진 인식·첨부는 제거했다.
 - 사용자 계정으로 Firebase 이메일/비밀번호 로그인 및 Firestore 읽기·쓰기 연결 진단은 이미 성공했다고 사용자에게 확인받음.
 - GitHub root index.html은 현재 운영 중인 Meal v2. legacy.html과 v2/ 하위 파일은 **백업/별도 기존 기능**. 삭제하지 말 것.
 
 ## 현재 우선순위
 1. 공식 Firebase 플러그인 (@Firebase)으로 현재 프로젝트 설정, 실제 Firestore 보안 규칙, Storage 버킷 상태를 **읽어서 검사**한다.
 2. repo의 firestore.rules가 실제 Firestore 구조와 맞는지 확인한다. **현행 규칙을 확인 없이 덮어쓰지 않는다**.
-3. Firebase Storage 활성화 여부, Storage 규칙의 인증 UID 경로와 사진 MIME/크기 제한을 검증한다.
-4. Cloud Functions 두 개(analyzeInventoryPhoto, suggestMeals)를 인증된 사용자만 쓰도록 구현·검증하고 배포한다. 최초 배포 전 사용자의 명시적 승인과 API 과금·비밀키 등록 필요.
-5. 실제 앱에서 사진 인식 결과를 '후보'로 보여주고 사람이 확정한 후 재고에 반영한다.
+3. 사진 기능을 다시 노출하지 않는다. 기존 Storage 파일과 규칙은 별도 요청 없이 삭제·변경하지 않는다.
+4. suggestMeals는 mode=single 요청에서 한 끼 후보 3개만 생성한다. 기존 analyzeInventoryPhoto는 종료 안내만 반환한다. 로그인 및 허용 UID 검사를 유지한다. 사용자는 Blaze·OpenAI 비용과 배포를 승인했으며 식단 AI 일일 횟수 제한 제거를 요청했다.
+5. 추천은 미리보기만 열고 메뉴 선택과 명시적 반영 버튼으로 한 끼만 저장한다. 기본 confirm 자동 처리에 의존하지 않는다. 날짜 7개의 주간 문서 안에 선택한 끼니만 저장하며 다른 메뉴를 보존한다.
 6. 식단은 밥/김치 외에 만들어진 음식이 있다고 가정하지 않는다. 국·반찬은 **별도의 조리시간과 재료**가 필요하다.
 7. 정확한 구매가격 없이 예산과 최종 결제 금액을 꾸며내지 않는다.
 
@@ -39,7 +39,9 @@
 - node --check functions/index.js
 - node --check v2/recipes.js
 - GitHub Pages 운영 화면 확인: 로그인 → Firestore 연결 진단 → 냉장고에서 수량 등록/수정 → 다른 기기 동기화
-- 사진 AI/식단 AI: 사용자가 OpenAI Secret을 설정하고 Firebase Cloud Functions 배포 완료한 뒤에만 테스트
+- node tests/function-quota.cjs 및 node tests/ai-plan-review.cjs
+- 실제 AI 시험은 후보 확인 후 닫기까지 수행한다. 운영 식단을 시험용으로 임의 저장하지 않는다.
+- 영양정보는 재료 기반 추정치다. 재료량 기준(내장 2인분 / AI 요청 인원 전체)을 구분하고 미확인 재료는 표시한다. 탄수화물 65% 초과 안내는 참고용이며 자료가 불완전하면 판정을 보류한다.
 
 ## 유료 AI 함수 사용 승인(필수)
 - Cloud Functions 배포 전 Firebase Secret Manager에 `OPENAI_API_KEY`와 **`MEAL_ALLOWED_UIDS`**를 등록하세요.

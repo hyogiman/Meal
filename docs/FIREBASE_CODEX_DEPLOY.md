@@ -1,5 +1,19 @@
 # Meal — Firebase 플러그인을 이용한 Codex 배포 인수인계
 
+## 현재 사용자 요구와 운영 상태 — 2026-11-05
+
+- 사진 인식·사진 첨부는 제거했다. 기존 파일과 재고 데이터를 삭제하지 않는다.
+- AI는 한 끼 후보 3개만 생성한다. 요청 형식은 mode=single, date, slot, servings, maxMinutes, style이다. 구버전 주간 요청은 비용 발생 전에 거절한다.
+- 후보 선택 후 명시적인 '선택한 한 끼 반영' 버튼으로 해당 날짜·끼니만 저장한다. 다른 끼니를 보존하기 위해 Firestore transaction에서 최신 주간 문서를 읽고 합친다.
+- 기존 Firestore 규칙의 days.size()==7을 유지한다. 주간 날짜 7개에 미등록 meals 배열을 비워 두므로 규칙 변경이 필요 없다.
+- 식단 AI의 일일 횟수 제한은 사용자 요청으로 제거했다. 인증·가족 UID 허용 목록과 maxInstances는 유지한다.
+- 인원별 재료량·탄단지·칼로리 재계산 및 탄수화물 비중 안내를 제공한다. 영양자료가 없거나 단위를 환산할 수 없는 재료는 미반영으로 표시한다.
+- 운영 앱에서 실제 한 끼 후보 응답과 저장하지 않고 닫기를 확인했다. 저장·교체는 운영 데이터 대신 로컬/모의 테스트로 검증했다.
+- 테스트: node tests/ai-plan-review.cjs, node tests/function-quota.cjs.
+- 최신 근거와 제한사항은 [배포 상태](FIREBASE_DEPLOY_STATUS.md)를 우선 참고한다.
+
+아래는 최초 연결 당시 인수인계 기록이다. 사진 기능과 주간 AI 생성에 관한 과거 체크리스트보다 위의 현재 요구가 우선한다.
+
 ## 이미 끝난 작업
 - 저장소: https://github.com/hyogiman/Meal
 - 운영 페이지: https://hyogiman.github.io/Meal/

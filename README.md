@@ -1,61 +1,59 @@
-# Meal v2 — 우리 집 식탁 매니저
+# Meal — 우리 집 식탁 매니저
 
-**GitHub Pages:** https://hyogiman.github.io/Meal/  
-**Firebase project:** `mealplan-786a6`  
-**현재 배포:** `main/index.html` · 이전 버전은 [legacy.html](./legacy.html)
+[Meal 앱 열기](https://hyogiman.github.io/Meal/) · 기존 주소는 https://2nhyeok.kr/Meal/ 로 연결됩니다.
+Firebase 프로젝트: `mealplan-786a6`. 이전 화면은 `legacy.html`과 `v2/`에 보존합니다.
 
-## 2026-11-03 연결 상태
+## 현재 기능 — 2026-11-05
 
-- ✅ GitHub `main/index.html`을 **Firebase v2 앱으로 교체 완료**. 로그인·재고·구매·식단 UI 코드를 포함합니다.
-- ✅ 사용자가 **Firebase Authentication의 이메일/비밀번호 로그인 활성화**, **Authorized domains 등록**, **Firestore 보안 규칙 게시**를 완료했다고 알려주셨습니다.
-- ✅ Firebase의 웹 설정(`apiKey`, `projectId`, `appId` 등)은 제공받은 `mealplan-786a6` 정보가 포함되어 있습니다.
-- ⚠️ **실제 사용자 로그인 및 Firestore 실시간 읽기·쓰기는 아직 사용자가 브라우저에서 검증해야 합니다.** 이 연결은 자격 증명 없이 원격에서 대신 확인할 수 없습니다.
-- ⚠️ GitHub Pages CDN 게시 상태와 실제 외부 접속은 이 실행 환경에서 직접 검증되지 않았습니다.
-- ⏳ **사진 AI · OpenAI 기반 새 식단**은 Cloud Functions, Secret Manager 및 별도 OpenAI API 배포가 필요해 아직 작동하지 않습니다.
-- ⏳ **식재료 사진을 Firebase Storage에 저장**하려면 Storage 버킷과 해당 Storage 규칙 활성화도 필요합니다.
+- 식재료는 이름·수량·단위·보관위치·소비기한을 직접 입력합니다.
+- 사진 인식과 사진 첨부 기능은 제거했습니다. 기존 사진 파일과 기록은 삭제하지 않습니다.
+- AI는 한 끼를 위한 서로 다른 메뉴 후보 3개만 추천합니다. 일주일 21끼를 한꺼번에 생성하지 않습니다.
+- 메뉴를 선택하면 1인분 기준 탄수화물·단백질·지방·칼로리 추정치를 볼 수 있습니다.
+- 선택한 날짜·끼니만 추가하거나 교체합니다. 다른 끼니의 메뉴는 유지됩니다.
+- 실제 구매금액 기록, 재고 입고·사용·폐기 이력, 장보기 목록, 예산, JSON/CSV 백업을 제공합니다.
 
-## 실연결 확인: 앱에서 직접 진단
+## 한 끼 선택하기
 
-1. [Meal 앱](https://hyogiman.github.io/Meal/)을 엽니다. 이전 화면이 보이면 **새로고침**해 주세요.
-2. 상단 **로그인**에서 Firebase 이메일/비밀번호로 로그인합니다. Authentication 공급자만 켠 상태에서 아직 계정이 없다면 **새 계정 만들기**를 먼저 누릅니다.
-3. 하단 **설정** → **🔎 Firebase 읽기·쓰기 연결 진단**을 누릅니다.
-4. 성공이면 **Firestore에 본인 계정용 임시 문서를 생성 → 읽기 → 삭제**했다는 메시지가 표시됩니다.
-5. **냉장고**에서 재료 하나 등록 → 새로고침 → 다른 기기에서 **같은 Firebase 계정**으로 로그인해 재고를 확인합니다.
+1. **일주일 식단**에서 먹을 날짜, 아침/점심/저녁, 인원, 조리시간을 고릅니다.
+2. **AI 한 끼 메뉴 3개 추천**을 누릅니다. **내장 메뉴에서 고르기**는 API 없이 사용할 수 있습니다.
+3. 후보의 영양정보와 **재료·조리법 보기**를 비교하고 메뉴 하나를 선택합니다.
+4. **선택한 한 끼 반영**을 눌러 저장합니다. 같은 날짜·끼니의 기존 메뉴가 있으면 그 한 끼만 교체됩니다.
+5. **저장하지 않고 닫기** 또는 Escape는 추천을 저장하지 않습니다.
 
-**중요:** 연결 테스트는 로그인한 사용자의 `users/{uid}/settings/__connection_check_{id}`에 임시 문서를 만듭니다. 기존 재고·구매·식단을 덮어쓰지 않습니다. Firebase 규칙으로 읽기/쓰기가 허용돼야 통과합니다. 생성 후 즉시 삭제하며, 실패 시 삭제 재시도 안내가 나옵니다.
+주간 달력은 필요한 끼니만 채울 수 있습니다. 식단 AI의 하루 횟수 제한은 없고, 버튼을 누를 때만 API를 요청합니다. AI 기능에는 로그인 및 허용된 가족 UID가 필요합니다.
 
-## 연결 오류 확인 순서
+## 장보기
 
-| 앱의 메시지 | 주로 확인할 부분 |
-|---|---|
-| Firebase SDK를 불러오지 못함 | 네트워크, 브라우저 광고/보안 확장, CDN 연결 |
-| 이메일 또는 비밀번호가 맞지 않음 | 로그인 계정 존재, 이메일/비밀번호, 계정 만들기 필요 여부 |
-| Authentication에서 해당 방법 활성화 요청 | Email/Password 공급자 |
-| Unauthorized domain | `hyogiman.github.io`가 Firebase 인증의 Authorized domains에 있는지 |
-| permission-denied | **현재 로그인 사용자 UID**와 Firestore Rules의 `users/{uid}` 하위 경로 일치 여부 |
-| unavailable / 데이터베이스 없음 | Firestore Database가 실제 생성·활성화되었는지 |
-| Storage 인증·권한 오류 | Storage 생성 여부 및 별도 `storage.rules` 게시 |
-| AI 함수 사용 불가 | Cloud Functions + `OPENAI_API_KEY` Secret 미배포 |
+저장한 식단 아래 **부족 재료를 장보기 목록에 추가**를 누르면 필요한 재료를 살 물건 목록으로 옮길 수 있습니다. 그 외 물건은 **살 물건 목록 → + 추가**로 입력합니다. 목록의 **구매**에서 실제 결제금액을 기록하고 재고 입고를 선택합니다. 예상가격은 실제 지출로 계산하지 않습니다.
 
-## v2 기능
+## 영양정보의 범위
 
-- 냉장고 재고: 식품명·수량·중량·단위·위치·유통기한·메모·사진
-- 실제 구매확정 → 구매금액 기록 및 재고 입고, 재고 사용·폐기 이력
-- 밥/김치 외의 새 국·반찬을 **자동으로 준비됐다고 가정하지 않는** 규칙기반 일주일 21끼 메뉴, 각 조리법·양념·재료량·전체 조리시간
-- 품목 부족 시 미구매 목록으로, 메뉴가 마음에 들지 않으면 한 끼 교체
-- 개인 사용자 단위 Firestore 데이터 동기화, 예산 관리, JSON/CSV 백업·복원
-- 실제 AI 추천 및 사진 인식은 *Cloud Functions 배포 후* 활성화되는 설계
+수치는 앱에 포함된 일반 식품 참고 성분과 레시피 분량으로 계산한 추정치입니다. 실제 브랜드, 조리 후 중량과 흡유량에 따라 달라집니다. 영양자료나 중량 환산 정보가 없는 재료는 미반영으로 표시하고 탄수화물 비중 판정을 보류합니다.
 
-## 보안
+탄수화물 에너지 비중 65% 초과 시 화면 안내를 표시합니다. 이는 [2025 한국인 영양소 섭취기준 설명](https://www.kns.or.kr/fileroom/fileroom_view.asp?BoardID=Kdr&idx=168)의 하루 에너지 비율을 참고한 한 끼 점검이며 개인별 처방이나 진단이 아닙니다. 칼로리·탄단지는 후보 선택과 메뉴 교체에 맞춰 다시 계산합니다.
 
-Firebase 웹 설정 키는 공식 문서에서 설명하는 **공개 앱 설정값**입니다. **OpenAI API 비밀키나 Firebase 서비스 계정 키를 웹 파일/공개 GitHub에 올리지 마세요.** Firestore Rules를 통해 로그인한 본인 UID의 문서만 접근하도록 해야 합니다.
+## 배포와 데이터
 
-기기 모드의 데이터는 Firebase로 자동 이전되지 않습니다. 필요하면 설정의 JSON 백업/복원 기능을 사용하세요. 다른 가족 계정끼리 공용 재고 공유 기능은 아직 구현 전입니다.
+- 프론트엔드: GitHub Pages `main/index.html`.
+- AI 서버: Cloud Functions v2, `asia-northeast3`, `suggestMeals`, 모델 `gpt-6.1-terra`.
+- 기존 `analyzeInventoryPhoto` 경로는 종료 안내만 반환하며 OpenAI를 호출하지 않는 코드로 전환했습니다.
+- 기존 Firestore/Storage 규칙과 재고·구매·사진 파일은 보존합니다. 주간 문서는 기존 규칙과 호환되도록 날짜 7개를 유지하고 미등록 끼니는 빈 배열로 둡니다.
+- OpenAI 비밀키와 허용 UID는 Secret Manager에만 보관합니다. 공개 GitHub에 저장하지 않습니다.
+- 기기 모드 데이터는 Firebase로 자동 이전되지 않습니다. 필요하면 JSON 백업/복원을 사용하세요.
+- 가족별 계정 간 공용 재고 공유는 제공하지 않습니다.
 
-## Codex와 Firebase 배포 준비 현황 (2026-11-03)
+운영 앱에서 실제 한 끼 AI 후보 반환, 선택 시 영양정보 표시, 저장하지 않고 닫기를 확인했습니다. 저장·교체와 다른 끼니 보존은 운영 데이터를 변경하지 않는 로컬/모의 테스트로 검증했습니다.
 
-- **GitHub에 백엔드 배포용 파일 준비 완료:** `functions/index.js`, `functions/package.json`, `storage.rules`, `firebase.json`, `.firebaserc`
-- **Codex 인수인계:** [AGENTS.md](./AGENTS.md), [Firebase 배포 절차](./docs/FIREBASE_CODEX_DEPLOY.md)
-- **배포 워크플로:** [Firebase Backend Action](./.github/workflows/firebase-backend.yml) — 안전을 위해 수동 실행만 가능, Google Cloud Workload Identity Federation 연결 전에는 배포 불가
-- **유료 AI 안전장치:** 로그인이 필요하고 사용 허용된 Firebase UID만 AI를 호출하도록 `MEAL_ALLOWED_UIDS` Secret 검증, 각 UID별 일일 횟수 제한
-- **주의:** 이 업데이트는 **코드 배포 준비**입니다. Firebase 프로젝트의 Cloud Functions·Storage를 실제로 배포한 것은 아닙니다. 이미 성공한 로그인·Firestore 사용 상태는 그대로 유지합니다. 현재 라이브 Rules는 Codex Firebase 플러그인에서 비교 검증하기 전에는 덮어쓰지 않습니다.
+자세한 기록: [배포 상태](docs/FIREBASE_DEPLOY_STATUS.md), [배포 절차](docs/FIREBASE_CODEX_DEPLOY.md), [개발 지침](AGENTS.md).
+GitHub Actions 배포는 별도 Workload Identity Federation 설정이 필요하며 이번 변경에서 새로 연결하지 않았습니다.
+
+## 로컬 검사
+
+```sh
+node --check functions/index.js
+node --check v2/recipes.js
+node tests/function-quota.cjs
+node tests/ai-plan-review.cjs
+```
+
+검사는 외부 OpenAI 호출이나 운영 Firestore 쓰기 없이 실행됩니다.

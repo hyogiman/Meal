@@ -492,7 +492,7 @@ async function aiWeekPlan(){
  if(state.mode!=='cloud'||!functions||!fb?.functions){notice('AI 추천은 로그인 후 이용할 수 있습니다. 내장 레시피는 바로 사용할 수 있습니다.');return;}
  const button=$('#aiWeekPlan');if(button.disabled)return;
  let target;try{target=weekTarget();}catch(e){notice(parseAuthError(e));return;}
- const requestUser=state.user?.uid,before=weekFingerprint(planFor(target.startDate));button.disabled=true;$('#createWeekPlan').disabled=true;button.textContent='일주일 식단 만드는 중…';
+ const requestUser=state.user?.uid,before=weekFingerprint(planFor(target.startDate));notice('');button.disabled=true;$('#createWeekPlan').disabled=true;button.textContent='일주일 식단 만드는 중…';
  try{
   const result=await fb.functions.httpsCallable(functions,'suggestMeals',{timeout:570000})({mode:'weekly',...target,avoidTitles:recommendationHistory()});
   if(state.mode!=='cloud'||state.user?.uid!==requestUser)throw Error('로그인 계정이 변경되어 추천을 닫았습니다.');
@@ -564,7 +564,7 @@ async function saveReviewedAiPlan(){
 async function aiMealPlan(){
  if(state.mode!=='cloud'||!functions||!fb?.functions){notice('AI 추천은 로그인 후 이용할 수 있습니다. 내장 메뉴는 바로 고를 수 있습니다.');return;}
  let target;try{target=mealTarget();}catch(e){notice(parseAuthError(e));return;}
- const requestUser=state.user?.uid;$('#aiPlan').disabled=true;$('#aiPlan').textContent='한 끼 후보 만드는 중…';
+ const requestUser=state.user?.uid;notice('');$('#aiPlan').disabled=true;$('#aiPlan').textContent='한 끼 후보 만드는 중…';
  try{const result=await fb.functions.httpsCallable(functions,'suggestMeals',{timeout:270000})({mode:'single',...target,avoidTitles:recommendationHistory()});
   if(state.mode!=='cloud'||state.user?.uid!==requestUser)throw Error('로그인 계정이 변경되어 추천을 닫았습니다.');
   if(!Array.isArray(result.data?.meals)||result.data.meals.length!==3)throw Error('한 끼 후보를 받지 못했습니다.');

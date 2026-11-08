@@ -9,7 +9,7 @@ function el(id){if(!elements.has(id)){const handlers={};elements.set(id,{value:'
 const context=vm.createContext({console,structuredClone,Date,Intl,crypto:require('node:crypto').webcrypto,
  document:{querySelector:el,querySelectorAll:()=>[]},localStorage:{getItem:()=>null,setItem(){}},setTimeout:()=>0,clearTimeout(){},window:{scrollTo(){}}});
 vm.runInContext(script.replace('initStatic();attachHandlers();renderAll();initFirebase();','')+`
-globalThis.api={nutritionEstimate,nutritionAlert,normalizeMealOption,mergeMealIntoPlan,recalculatePlan,buildMeal,recipes:RECIPES,ingredientScale,mealReadyCourse,aiMealPlan,saveReviewedAiPlan,selectMealCandidate,attachHandlers,state,createWeekPlan,saveWeekPlan,changeMeal};
+globalThis.api={nutritionEstimate,nutritionAlert,normalizeMealOption,mergeMealIntoPlan,recalculatePlan,buildMeal,recipes:RECIPES,ingredientScale,mealReadyCourse,aiMealPlan,saveReviewedAiPlan,selectMealCandidate,attachHandlers,state,createWeekPlan,saveWeekPlan,changeMeal,aiWeekPlan};
 `,context);
 const a=context.api;
 const raw=(name='달걀',qty=100)=>({title:name+' 요리',courses:[{title:name+' 요리',role:'main',minutes:15,requiresRice:false,ingredients:[{name,qty,unit:'g'}],seasonings:[],steps:['재료를 익힙니다.']}]});
@@ -79,5 +79,17 @@ const plain=x=>JSON.parse(JSON.stringify(x));
  assert.equal(standalone.days[2].meals[0].slot,'점심');assert.equal(standalone.days[2].meals[0].title,'닭고기 요리');
  assert.equal(JSON.stringify(documents.get('2026-11-02')),preservedWeek);
  assert.equal(JSON.stringify(a.state.inventory),inventoryBefore,'Planning must not modify inventory');
- console.log('PASS: nutrition/scaling, three candidates, explicit save/cancel, account guard, full-week preview/save, replacement consent, concurrent edit protection, per-slot regeneration preserving 20 meals, post-preview placement in empty week, inventory unchanged and photo removal. No network or production writes.');
+ const seasoned=raw('돼지고기',300);seasoned.courses[0].seasonings=[{name:'고춧가루',qty:6,unit:'g'},{name:'진간장',qty:15,unit:'ml'}];
+ const seasonedPlan=a.mergeMealIntoPlan(null,target,a.normalizeMealOption(seasoned,2),[{name:'돼지고기',qty:1,unit:'kg'},{name:'고춧가루',qty:2,unit:'g'}]);
+ assert.equal(seasonedPlan.missing.find(x=>x.name==='고춧가루').qty,4);assert.equal(seasonedPlan.missing.find(x=>x.name==='진간장').qty,15);assert(!seasonedPlan.missing.some(x=>x.name==='돼지고기'));
+ let malformedWeek=false;const aiWeekWrites=writes;
+ context.fakeFb.functions.httpsCallable=()=>async payload=>{assert.equal(payload.mode,'weekly');assert(payload.avoidTitles.includes('닭고기 요리'));return {data:{days:Array.from({length:7},(_,i)=>({date:'2026-11-'+String(16+i),meals:['아침','점심','저녁'].map((slot,j)=>({...seasoned,title:'AI '+i+' '+j,slot:malformedWeek?'아침':slot}))}))}};};
+ el('#planDate').value='2026-11-16';await a.aiWeekPlan();assert.equal(writes,aiWeekWrites);assert.equal(el('#weekReviewDialog').open,true);
+ assert.match(el('#weekReviewContent').innerHTML,/고춧가루/);el('#weekReviewDialog').close();await a.saveWeekPlan();assert.equal(writes,aiWeekWrites);
+ malformedWeek=true;await a.aiWeekPlan();assert.equal(el('#weekReviewDialog').open,false);assert.equal(el('#aiWeekPlan').disabled,false);
+ malformedWeek=false;await a.aiWeekPlan();await a.saveWeekPlan();assert.equal(writes,aiWeekWrites+1);
+ const aiSaved=documents.get('2026-11-16');assert.equal(aiSaved.days.flatMap(d=>d.meals).length,21);assert.equal(aiSaved.source,'AI 주간 추천');
+ assert.equal(aiSaved.days[0].meals[0].courses[0].seasonings[0].qty,6);assert.equal(aiSaved.missing.find(x=>x.name==='고춧가루').qty,126);
+ assert.equal(JSON.stringify(a.state.inventory),inventoryBefore);
+ console.log('PASS: AI and built-in week previews, explicit save/cancel, malformed slots, nutrition/scaling, seasoning shortages and no double scaling, single-slot replacement preserving 20 meals, flexible placement, concurrent/account guards, inventory unchanged and photo removal. No network or production writes.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

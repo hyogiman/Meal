@@ -11,12 +11,13 @@ const ALLOWED=defineSecret('MEAL_ALLOWED_UIDS');
 const REGION='asia-northeast3';
 const OPTIONS={region:REGION,secrets:[KEY,ALLOWED],maxInstances:2,timeoutSeconds:240,memory:'512MiB',
   cors:['https://hyogiman.github.io','https://2nhyeok.kr','https://mealplan-786a6.web.app','https://mealplan-786a6.firebaseapp.com']};
+const AI_UNITS=['g','kg','ml','L','개'];
 const U={type:'object',additionalProperties:false,required:['name','qty','unit'],properties:{
-  name:{type:'string'},qty:{type:'number'},unit:{type:'string'}}};
+  name:{type:'string'},qty:{type:'number',minimum:0.001,maximum:10000},unit:{type:'string',enum:AI_UNITS}}};
 const COURSE={type:'object',additionalProperties:false,required:['title','role','minutes','requiresRice','ingredients','seasonings','steps'],properties:{
   title:{type:'string'},role:{type:'string',enum:['main','soup','side','bowl']},minutes:{type:'number'},
-  requiresRice:{type:'boolean'},ingredients:{type:'array',items:U},seasonings:{type:'array',items:U},
-  steps:{type:'array',items:{type:'string'}}}};
+  requiresRice:{type:'boolean'},ingredients:{type:'array',minItems:1,maxItems:30,items:U},seasonings:{type:'array',maxItems:20,items:U},
+  steps:{type:'array',minItems:1,maxItems:8,items:{type:'string'}}}};
 const MEAL={type:'object',additionalProperties:false,required:['title','courses'],properties:{
   title:{type:'string'},courses:{type:'array',minItems:1,maxItems:2,items:COURSE}}};
 const SUGGESTIONS={type:'object',additionalProperties:false,required:['meals'],properties:{
@@ -29,6 +30,7 @@ const WEEKLY={type:'object',additionalProperties:false,required:['recipes','days
 function uid(request){const id=request.auth?.uid;if(!id)throw new HttpsError('unauthenticated','Meal 로그인 후 이용해 주세요.');const allow=(ALLOWED.value()||'').split(',').map(s=>s.trim()).filter(Boolean);if(!allow.includes(id))throw new HttpsError('permission-denied','AI 기능은 등록된 가족 계정에서만 사용할 수 있습니다.');return id;}
 function client(weekly=false){const key=KEY.value();if(!key)throw new HttpsError('failed-precondition','Cloud Functions에 OPENAI_API_KEY 비밀키가 설정되지 않았습니다.');return new OpenAI({apiKey:key,timeout:weekly?480000:190000,maxRetries:0});}
 function safeNumber(n,def=0){const x=Number(n);return Number.isFinite(x)?x:def;}
+function validMeals(meals,count){return Array.isArray(meals)&&meals.length===count&&meals.every(m=>typeof m.title==='string'&&m.title.trim()&&Array.isArray(m.courses)&&m.courses.length>=1&&m.courses.length<=2&&m.courses.every(c=>Array.isArray(c.ingredients)&&c.ingredients.length>=1&&c.ingredients.length<=30&&Array.isArray(c.seasonings)&&c.seasonings.length<=20&&Array.isArray(c.steps)&&c.steps.length>=1&&c.steps.length<=8&&[...c.ingredients,...c.seasonings].every(x=>typeof x.name==='string'&&x.name.trim()&&Number.isFinite(x.qty)&&x.qty>=0.001&&x.qty<=10000&&AI_UNITS.includes(x.unit))));}
 exports.analyzeInventoryPhoto=onCall(OPTIONS,async req=>{
   uid(req);
   // Retired endpoint also protects cached clients from starting paid photo requests.
@@ -55,7 +57,7 @@ exports.suggestMeals=onCall({...OPTIONS,timeoutSeconds:540},async req=>{
       weekly?'시작일부터 7일의 아침·점심·저녁 총 21끼를 계획하세요. 서로 다른 메뉴 14개를 recipes에 작성하고 days 7개 각각의 breakfast/lunch/dinner에 해당 recipes의 0부터 시작하는 인덱스를 배정하세요. 같은 메뉴는 최대 2회, 같은 날 중복 없이 배치하고 연속 끼니 중복을 피하세요. 아침은 간단하게, 단백질과 채소의 다양성을 고려하세요.':'선택한 날짜의 한 끼를 위한 서로 다른 메뉴 후보 정확히 3개를 JSON meals 배열로 작성하세요. 주간 식단을 만들지 마세요.',
       '이미 만들어진 음식은 밥과 김치뿐입니다. 모든 추가 국/반찬/주찬은 별도의 course로 구성합니다.',
       '각 후보는 주찬 1개를 기본으로 하고 꼭 필요한 경우만 별도 국/반찬을 추가합니다. 각 course에 식재료, 양념, 간결한 조리순서 4단계와 조리시간을 적으세요.',
-      '재료·양념의 수량은 요청한 servings 전체 분량이며 가능한 g/ml를 사용하세요. 쌀밥을 별도로 곁들일 때만 requiresRice=true로 표시하세요. 밥이 재료에 들어가거나 국수/파스타인 경우 false입니다.',
+      '재료·양념의 수량은 요청한 servings 전체 분량이며 가능한 g/ml를 사용하세요. 단위는 g, kg, ml, L, 개만 허용합니다. 큰술·작은술·꼬집·약간을 쓰지 말고 중량이나 부피로 환산하며 0인 재료는 목록에서 제외하세요. 쌀밥을 별도로 곁들일 때만 requiresRice=true로 표시하세요. 밥이 재료에 들어가거나 국수/파스타인 경우 false입니다.',
       '한 끼 조리시간은 각 course minutes 합으로 계산하고 가능한 한 maxMinutes 이하여야 합니다.',
       '메뉴 선택은 고기·생선·달걀·두부·콩·채소 등 주재료 중심으로 하세요. 재고의 서로 다른 주재료를 고르게 활용하고 동일 주재료도 구이·찜·조림·볶음·국·덮밥 등 조리법과 맛을 달리하세요. 특정 몇 가지 음식으로 고정하지 말고 현실적인 가정식을 다양하게 구성하세요. 생소한 억지 조합은 피하세요.',
       '고춧가루·고추장·된장·간장·소금·설탕·식초·참기름·식용유·후추·마늘·생강·대파 등 맛을 내는 재료가 재고에 없거나 미등록이어도 그 이유만으로 메뉴를 제외하지 마세요. 해당 요리에 실제 필요한 것만 빠짐없이 수량과 단위를 적으세요. 재고에 있다고 가정하지 마세요. 부족분은 앱이 계산합니다.',
@@ -70,7 +72,7 @@ exports.suggestMeals=onCall({...OPTIONS,timeoutSeconds:540},async req=>{
       text:{format:{type:'json_schema',name:weekly?'meal_weekly_plan':'meal_single_options',strict:true,schema:weekly?WEEKLY:SUGGESTIONS}},max_output_tokens:weekly?14000:5000,store:false});
     const result=JSON.parse(r.output_text||'{}');
     if(weekly){
-      if(r.status==='incomplete'||!Array.isArray(result.recipes)||result.recipes.length!==14||result.recipes.some(m=>!Array.isArray(m.courses)||m.courses.length<1||m.courses.length>2)||!Array.isArray(result.days)||result.days.length!==7)throw Error('weekly plan structure invalid');
+      if(r.status==='incomplete'||!validMeals(result.recipes,14)||!Array.isArray(result.days)||result.days.length!==7)throw Error('weekly plan structure invalid');
       const titles=result.recipes.map(m=>String(m.title||'').replace(/\s/g,''));
       if(titles.some(t=>!t)||new Set(titles).size!==14)throw Error('weekly duplicate recipe titles');
       const uses=new Map();let previous=-1;
@@ -81,7 +83,7 @@ exports.suggestMeals=onCall({...OPTIONS,timeoutSeconds:540},async req=>{
       })}));
       return {days,disclaimer:'일주일 식단 초안입니다. 미리보기에서 확인한 뒤 저장하세요.'};
     }
-    if(r.status==='incomplete'||!Array.isArray(result.meals)||result.meals.length!==3||result.meals.some(m=>!Array.isArray(m.courses)||m.courses.length<1||m.courses.length>2))throw Error('meal options structure invalid');
+    if(r.status==='incomplete'||!validMeals(result.meals,3))throw Error('meal options structure invalid');
     return {meals:result.meals,disclaimer:'한 끼 후보입니다. 하나를 선택하고 재료·수량을 확인한 뒤 반영하세요.'};
   }catch(e){console.error('Meal plan error',e?.status||e?.code||'unknown');throw new HttpsError('internal','AI 식단 추천에 실패했습니다. 내장 레시피를 이용해 주세요.');}
 });

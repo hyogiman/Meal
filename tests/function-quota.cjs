@@ -1,9 +1,10 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-let requests=[],transactions=0,incomplete=false;
+let requests=[],transactions=0,incomplete=false,malform=null;
 const db={collection:()=>({limit:()=>({get:async()=>({docs:[]})})}),doc:()=>({get:async()=>({data:()=>({budget:80000})})}),runTransaction:()=>{transactions++;throw Error('No quota writes expected');}};
 class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-class OpenAI{constructor(){this.responses={create:async request=>{requests.push(request);return {status:incomplete?'incomplete':'completed',output_text:JSON.stringify({meals:Array.from({length:3},()=>({title:'test',courses:[{}]}))})};}};}}
+const recipe=i=>({title:'메뉴 '+i,courses:[{title:'요리 '+i,role:'main',minutes:20,requiresRice:true,ingredients:[{name:'돼지고기',qty:300,unit:'g'}],seasonings:[{name:'고춧가루',qty:6,unit:'g'},{name:'진간장',qty:15,unit:'ml'}],steps:['재료를 준비한다.','양념을 섞는다.','충분히 익힌다.','나눈다.']}]});
+class OpenAI{constructor(){this.responses={create:async request=>{requests.push(request);let output=request.text.format.name==='meal_weekly_plan'?{recipes:Array.from({length:14},(_,i)=>recipe(i)),days:Array.from({length:7},(_,i)=>({breakfast:(i*3)%14,lunch:(i*3+1)%14,dinner:(i*3+2)%14}))}:{meals:Array.from({length:3},(_,i)=>recipe(i))};if(malform)malform(output);return {status:incomplete?'incomplete':'completed',output_text:JSON.stringify(output)};}};}}
 const context=vm.createContext({exports:{},console,Date,require:name=>{
  if(name==='firebase-functions/v2/https')return {onCall:(_options,handler)=>handler,HttpsError};
  if(name==='firebase-functions/params')return {defineSecret:name=>({value:()=>name==='MEAL_ALLOWED_UIDS'?'test-family':'test-key'})};
@@ -23,6 +24,16 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,'../functions/index.js'),'ut
  await assert.rejects(context.exports.suggestMeals({...request,auth:{uid:'outsider'}}),e=>e.code==='permission-denied');
  await assert.rejects(context.exports.analyzeInventoryPhoto(request),e=>e.code==='failed-precondition');
  assert.equal(requests.length,3,'Rejected weekly/photo requests must not reach OpenAI');
- incomplete=true;await assert.rejects(context.exports.suggestMeals(request),e=>e.code==='internal');
- console.log('PASS: single-meal schema/budget, unlimited requests, auth, input dates, legacy weekly and photo rejection, incomplete-response handling; no network/writes.');
+ const weeklyRequest={...request,data:{mode:'weekly',startDate:'2026-12-28',servings:3,avoidTitles:['이전 메뉴']}};
+ const week=await context.exports.suggestMeals(weeklyRequest);assert.equal(week.days.length,7);assert.equal(week.days[6].date,'2027-01-03');
+ assert.equal(week.days.flatMap(d=>d.meals).length,21);assert.equal(new Set(week.days.flatMap(d=>d.meals.map(m=>m.title))).size,14);
+ for(const day of week.days)assert.deepEqual(Array.from(day.meals,m=>m.slot),['아침','점심','저녁']);
+ assert.equal(week.days[0].meals[0].courses[0].seasonings[0].qty,6,'Required seasoning quantities must reach client');
+ assert.equal(requests.at(-1).max_output_tokens,14000);assert.deepEqual(JSON.parse(requests.at(-1).input[0].content).avoidTitles,['이전 메뉴']);
+ for(const invalid of [out=>out.days.pop(),out=>out.days[0].breakfast=14,out=>out.days[0].lunch=out.days[0].breakfast,out=>out.recipes[1].title=out.recipes[0].title]){
+  malform=invalid;await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');
+ }
+ malform=null;incomplete=true;await assert.rejects(context.exports.suggestMeals(request),e=>e.code==='internal');await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');
+ assert.equal(transactions,0);
+ console.log('PASS: single and weekly AI schemas, 7 dates/21 slots across year boundary, 14 varied recipes, seasoning quantities, unlimited requests, auth/input guards, malformed/repetitive/incomplete rejection, photo retirement; no network/writes.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

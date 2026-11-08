@@ -17,6 +17,8 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,'../functions/index.js'),'ut
  for(let i=0;i<3;i++)assert.equal((await context.exports.suggestMeals(request)).meals.length,3);
  assert.equal(transactions,0);assert.equal(requests.length,3);assert.equal(requests[0].max_output_tokens,5000);
  assert.equal(requests[0].text.format.schema.properties.meals.maxItems,3);
+ const itemSchema=requests[0].text.format.schema.properties.meals.items.properties.courses.items.properties.seasonings.items;
+ assert.deepEqual(Array.from(itemSchema.properties.unit.enum),['g','kg','ml','L','개']);assert(itemSchema.properties.qty.minimum>0);
  for(const data of [{startDate:'2026-11-04',servings:2},{...request.data,date:'2026-02-30'},{...request.data,slot:'간식'},{...request.data,servings:0}]){
   await assert.rejects(context.exports.suggestMeals({...request,data}),e=>['invalid-argument','failed-precondition'].includes(e.code));
  }
@@ -30,7 +32,7 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,'../functions/index.js'),'ut
  for(const day of week.days)assert.deepEqual(Array.from(day.meals,m=>m.slot),['아침','점심','저녁']);
  assert.equal(week.days[0].meals[0].courses[0].seasonings[0].qty,6,'Required seasoning quantities must reach client');
  assert.equal(requests.at(-1).max_output_tokens,14000);assert.deepEqual(JSON.parse(requests.at(-1).input[0].content).avoidTitles,['이전 메뉴']);
- for(const invalid of [out=>out.days.pop(),out=>out.days[0].breakfast=14,out=>out.days[0].lunch=out.days[0].breakfast,out=>out.recipes[1].title=out.recipes[0].title]){
+ for(const invalid of [out=>out.days.pop(),out=>out.days[0].breakfast=14,out=>out.days[0].lunch=out.days[0].breakfast,out=>out.recipes[1].title=out.recipes[0].title,out=>out.recipes[0].courses[0].seasonings[0].unit='작은술',out=>out.recipes[0].courses[0].seasonings[0].qty=0]){
   malform=invalid;await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');
  }
  malform=null;incomplete=true;await assert.rejects(context.exports.suggestMeals(request),e=>e.code==='internal');await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');

@@ -34,7 +34,7 @@ dialog{border:1px solid #dbe8dd;border-radius:20px;padding:0;box-shadow:0 25px 1
 </section>
 <section class="page" id="page-shopping"><div class="section-heading"><div><p class="eyebrow">SHOP & RECORD</p><h1>장보기와 실제 지출</h1><p>구매 예정과 실제 결제를 분리합니다. 구매를 확정한 품목만 재고에 입고할 수 있습니다.</p></div><button id="newPurchase" class="primary">+ 구매 기록</button></div><div class="budget-band"><div><span>이번 주 예산</span><strong id="shopBudget">80,000원</strong></div><div><span>실제로 쓴 돈</span><strong id="shopSpent">0원</strong></div><div><span>남은 예산</span><strong id="shopRemain">80,000원</strong></div></div><div class="progress-track"><div id="shopProgress"></div></div><div class="two-columns"><div class="panel"><div class="panel-title"><h2>살 물건 목록</h2><button id="newWishlist" class="text-button">+ 추가</button></div><p class="caption">가격은 예상가격입니다. 실제 지출로 잡히지 않습니다.</p><div id="wishList" class="stack-list"></div></div><div class="panel"><div class="panel-title"><h2>구매 내역</h2><button id="exportPurchases" class="text-button">CSV</button></div><div id="purchaseList" class="stack-list"></div></div></div><div class="hint">영수증 총액을 여러 품목으로 나누어 기록할 때는 각 품목의 실제 금액을 적어주세요. 품목별 합계가 실제 결제금액과 일치하는지 확인한 다음 저장하는 편이 안전합니다.</div></section>
 <section class="page" id="page-planner"><div class="section-heading"><div><p class="eyebrow">YOUR WEEK, YOUR CHOICE</p><h1>일주일 식단과 메뉴 추천</h1><p>일주일 식단을 만들고 원하는 끼니만 바꾸거나, 메뉴 후보부터 골라 원하는 날짜에 넣으세요.</p></div></div>
-<div class="panel planner-controls"><h2>① 일주일 식단 만들기</h2><div class="control-grid"><label class="field"><span>보는 주 시작일</span><input id="planDate" type="date"></label><label class="field"><span>주간 식사 인원</span><select id="weekServings"><option value="2">성인 2명</option><option value="1">성인 1명</option><option value="3">성인 3명</option><option value="4">성인 4명</option></select></label><label class="field"><span>주간 한 끼 조리시간</span><select id="weekTime"><option value="20">20분 이하</option><option value="35" selected>35분 이하</option><option value="50">50분 이하</option></select></label></div><div class="plan-buttons"><button id="createWeekPlan" class="primary" type="button">재고로 일주일 식단 만들기</button></div><p class="caption">내장 레시피로 7일·21끼를 먼저 구성합니다. API 호출 없이 생성되며, 미리보기를 확인한 뒤 저장합니다. 저장 후 마음에 안 드는 끼니만 AI로 다시 추천받을 수 있습니다.</p></div>
+<div class="panel planner-controls"><h2>① 일주일 식단 만들기</h2><div class="control-grid"><label class="field"><span>보는 주 시작일</span><input id="planDate" type="date"></label><label class="field"><span>주간 식사 인원</span><select id="weekServings"><option value="2">성인 2명</option><option value="1">성인 1명</option><option value="3">성인 3명</option><option value="4">성인 4명</option></select></label><label class="field"><span>주간 한 끼 조리시간</span><select id="weekTime"><option value="20">20분 이하</option><option value="35" selected>35분 이하</option><option value="50">50분 이하</option></select></label></div><div class="plan-buttons"><button id="aiWeekPlan" class="primary" type="button">AI로 일주일 식단 만들기</button><button id="createWeekPlan" class="outline" type="button">내장 레시피로 만들기</button></div><p class="caption">AI가 재고를 참고해 7일·21끼를 추천합니다. 미리보기를 확인한 뒤 저장하고, 마음에 안 드는 끼니만 다시 추천받으세요. AI 생성은 몇 분 걸릴 수 있습니다. 내장 레시피는 API 없이 이용할 수 있습니다.</p></div>
 <div class="panel planner-controls"><h2>② 메뉴 후보부터 골라 넣기</h2><div class="control-grid"><label class="field"><span>먹을 날짜</span><input id="mealDate" type="date" required></label><label class="field"><span>끼니</span><select id="mealSlot"><option>아침</option><option>점심</option><option selected>저녁</option></select></label><label class="field"><span>식사 인원</span><select id="planServings"><option value="2">성인 2명</option><option value="1">성인 1명</option><option value="3">성인 3명</option><option value="4">성인 4명</option></select></label><label class="field"><span>한 끼 조리 가능 시간</span><select id="planTime"><option value="20">20분 이하</option><option value="35" selected>35분 이하</option><option value="50">50분 이하</option></select></label><label class="field"><span>식단 취향</span><select id="planStyle"><option value="home">익숙한 한국 가정식</option><option value="varied">면 요리도 섞기</option><option value="lowcarb">탄수화물 비중 줄이기</option></select></label></div><div class="plan-buttons"><button id="aiPlan" class="primary" type="button">AI 한 끼 메뉴 3개 추천</button><button id="createPlan" class="outline" type="button">내장 메뉴에서 고르기</button></div><p class="caption">추천은 저장되지 않습니다. 메뉴 하나를 선택한 뒤 ‘선택한 한 끼 반영’을 눌러야 식단에 들어갑니다. AI는 버튼을 누를 때만 호출됩니다.</p></div>
 
 <div id="planSummary" class="panel" hidden></div><div id="weeklyPlan" class="week-plan"></div><div class="panel" id="planEmpty"><div class="empty-icon">▦</div><h3>아직 식단을 만들지 않았습니다.</h3><p>일주일 식단을 만들거나, 메뉴 후보를 골라 한 끼부터 채워보세요.</p></div><div id="nextWeekPrompt" class="panel" hidden><strong>저장한 식단의 장보기</strong><p>현재 재고에서 부족한 재료를 정리해 장보기 목록으로 옮길 수 있습니다.</p><button id="addMissingToWish" class="outline">부족 재료를 장보기 목록에 추가</button></div>
@@ -469,18 +469,42 @@ async function addMissing(){const p=planFor();if(!p)return;const missing=recalcu
  }catch(e){toast(parseAuthError(e));}
 }
 let pendingWeekPlan=null;
+let recentAiMenus={user:null,titles:[]};
+function recommendationHistory(){const user=state.user?.uid||null;if(recentAiMenus.user!==user)recentAiMenus={user,titles:[]};return [...new Set([...recentAiMenus.titles,...[...state.plans].sort((a,b)=>String(b.startDate||b.id).localeCompare(String(a.startDate||a.id))).slice(0,2).flatMap(p=>p.days.flatMap(d=>d.meals.map(m=>m.title)))])].slice(0,40);}
+function rememberSuggestions(meals){const user=state.user?.uid||null;if(recentAiMenus.user!==user)recentAiMenus={user,titles:[]};recentAiMenus.titles=[...new Set([...meals.map(m=>m.title),...recentAiMenus.titles])].slice(0,20);}
 function weekFingerprint(plan){return plan?JSON.stringify({days:plan.days,servings:plan.servings,updatedAt:plan.updatedAt||null}):null;}
+function weekTarget(){
+ const startDate=$('#planDate').value,servings=Number($('#weekServings').value),maxMinutes=Number($('#weekTime').value);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(startDate)||!Number.isFinite(Date.parse(startDate+'T12:00:00Z'))||new Date(startDate+'T12:00:00Z').toISOString().slice(0,10)!==startDate||!Number.isInteger(servings)||servings<1||servings>4)throw Error('주 시작일과 인원을 확인해 주세요.');
+ return {startDate,servings,maxMinutes};
+}
+function showWeekPreview(plan,before){
+ pendingWeekPlan={plan,mode:state.mode,user:state.user?.uid||null,before};
+ $('#weekReviewError').textContent='';$('#replaceWeekCheck').checked=false;$('#replaceWeekLabel').hidden=before===null;$('#saveWeekPlan').disabled=before!==null;
+ $('#weekReviewInfo').textContent=plan.startDate+'부터 7일·21끼 · '+plan.servings+'인분 · '+plan.source+'. 아직 저장되지 않았습니다.';
+ $('#weekReviewContent').innerHTML=plan.days.map(day=>`<section><h3>${esc(day.date)}</h3>${day.meals.map(meal=>`<details><summary>${esc(meal.slot)} · ${esc(meal.title)} · ${meal.minutes}분</summary>${recipeHTML(meal)}</details>`).join('')}</section>`).join('');
+ openModal('weekReviewDialog');
+}
 function createWeekPlan(){
+ try{const target=weekTarget(),before=weekFingerprint(planFor(target.startDate)),plan=recalculatePlan(generateWeek({inventory:state.inventory,...target,seed:Date.now()%100000}),state.inventory);plan.source='내장 레시피';showWeekPreview(plan,before);}catch(e){notice(parseAuthError(e));}
+}
+async function aiWeekPlan(){
+ if(state.mode!=='cloud'||!functions||!fb?.functions){notice('AI 추천은 로그인 후 이용할 수 있습니다. 내장 레시피는 바로 사용할 수 있습니다.');return;}
+ const button=$('#aiWeekPlan');if(button.disabled)return;
+ let target;try{target=weekTarget();}catch(e){notice(parseAuthError(e));return;}
+ const requestUser=state.user?.uid,before=weekFingerprint(planFor(target.startDate));button.disabled=true;$('#createWeekPlan').disabled=true;button.textContent='일주일 식단 만드는 중…';
  try{
-  const date=$('#planDate').value,servings=Number($('#weekServings').value),maxMinutes=Number($('#weekTime').value);
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T12:00:00Z'))||new Date(date+'T12:00:00Z').toISOString().slice(0,10)!==date||!Number.isInteger(servings)||servings<1||servings>4)throw Error('주 시작일과 인원을 확인해 주세요.');
-  const existing=planFor(date),plan=recalculatePlan(generateWeek({inventory:state.inventory,servings,maxMinutes,startDate:date,seed:Date.now()%100000}),state.inventory);
-  pendingWeekPlan={plan,mode:state.mode,user:state.user?.uid||null,before:weekFingerprint(existing)};
-  $('#weekReviewError').textContent='';$('#replaceWeekCheck').checked=false;$('#replaceWeekLabel').hidden=!existing;$('#saveWeekPlan').disabled=!!existing;
-  $('#weekReviewInfo').textContent=date+'부터 7일·21끼 · '+servings+'인분. 아직 저장되지 않았습니다.';
-  $('#weekReviewContent').innerHTML=plan.days.map(day=>`<section><h3>${esc(day.date)}</h3>${day.meals.map(meal=>`<details><summary>${esc(meal.slot)} · ${esc(meal.title)} · ${meal.minutes}분</summary>${recipeHTML(meal)}</details>`).join('')}</section>`).join('');
-  openModal('weekReviewDialog');
- }catch(e){notice(parseAuthError(e));}
+  const result=await fb.functions.httpsCallable(functions,'suggestMeals',{timeout:570000})({mode:'weekly',...target,avoidTitles:recommendationHistory()});
+  if(state.mode!=='cloud'||state.user?.uid!==requestUser)throw Error('로그인 계정이 변경되어 추천을 닫았습니다.');
+  if(!Array.isArray(result.data?.days)||result.data.days.length!==7)throw Error('일주일 식단을 받지 못했습니다.');
+  const days=result.data.days.map((day,i)=>{
+   const date=plusDays(target.startDate,i);if(day.date!==date||!Array.isArray(day.meals)||day.meals.length!==3)throw Error('식단 날짜나 끼니가 올바르지 않습니다.');
+   const meals=['아침','점심','저녁'].map(slot=>{const entries=day.meals.filter(m=>m.slot===slot);if(entries.length!==1)throw Error('식단 끼니가 중복되거나 빠졌습니다.');return {...normalizeMealOption(entries[0],target.servings),slot,source:'AI 주간 추천'};});
+   return {date,meals};
+  });
+  const plan=recalculatePlan({id:target.startDate,...target,days,source:'AI 주간 추천',createdAt:new Date().toISOString()},state.inventory);rememberSuggestions(days.flatMap(d=>d.meals));showWeekPreview(plan,before);
+ }catch(e){notice('일주일 AI 추천에 실패했습니다. '+parseAuthError(e));}
+ finally{button.disabled=false;$('#createWeekPlan').disabled=false;button.textContent='AI로 일주일 식단 만들기';}
 }
 async function saveWeekPlan(){
  const draft=pendingWeekPlan,button=$('#saveWeekPlan');if(!draft||button.disabled)return;
@@ -541,10 +565,10 @@ async function aiMealPlan(){
  if(state.mode!=='cloud'||!functions||!fb?.functions){notice('AI 추천은 로그인 후 이용할 수 있습니다. 내장 메뉴는 바로 고를 수 있습니다.');return;}
  let target;try{target=mealTarget();}catch(e){notice(parseAuthError(e));return;}
  const requestUser=state.user?.uid;$('#aiPlan').disabled=true;$('#aiPlan').textContent='한 끼 후보 만드는 중…';
- try{const result=await fb.functions.httpsCallable(functions,'suggestMeals',{timeout:270000})({mode:'single',...target});
+ try{const result=await fb.functions.httpsCallable(functions,'suggestMeals',{timeout:270000})({mode:'single',...target,avoidTitles:recommendationHistory()});
   if(state.mode!=='cloud'||state.user?.uid!==requestUser)throw Error('로그인 계정이 변경되어 추천을 닫았습니다.');
   if(!Array.isArray(result.data?.meals)||result.data.meals.length!==3)throw Error('한 끼 후보를 받지 못했습니다.');
-  showMealCandidates(result.data.meals.map(m=>normalizeMealOption(m,target.servings)),target);
+  const meals=result.data.meals.map(m=>normalizeMealOption(m,target.servings));rememberSuggestions(meals);showMealCandidates(meals,target);
  }catch(e){notice('한 끼 추천에 실패했습니다. '+parseAuthError(e));}
  finally{$('#aiPlan').disabled=false;$('#aiPlan').textContent='AI 한 끼 메뉴 3개 추천';}
 }
@@ -628,7 +652,7 @@ $('#inventoryForm').addEventListener('submit',saveInventoryForm);
  $('#wishList').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{if(b.dataset.buyWish)openPurchase(b.dataset.buyWish);if(b.dataset.delWish&&confirm('이 구매 예정 품목을 삭제할까요?'))await erase('wishlist',b.dataset.delWish);}catch(err){toast(parseAuthError(err));}});
  $('#purchaseList').addEventListener('click',e=>{const b=e.target.closest('button');if(b?.dataset.cancelPurchase)cancelPurchase(b.dataset.cancelPurchase);});
  $('#exportPurchases').addEventListener('click',savePurchaseCsv);
- $('#createWeekPlan').addEventListener('click',createWeekPlan);$('#saveWeekPlan').addEventListener('click',saveWeekPlan);$('#replaceWeekCheck').addEventListener('change',()=>{$('#saveWeekPlan').disabled=!$('#replaceWeekCheck').checked;});$('#weekReviewDialog').addEventListener('close',()=>{pendingWeekPlan=null;});$('#createPlan').addEventListener('click',createPlan);$('#aiPlan').addEventListener('click',aiMealPlan);$('#saveAiPlan').addEventListener('click',saveReviewedAiPlan);$('#aiPlanReviewDialog').addEventListener('close',()=>{pendingAiPlan=null;});$('#aiPlanReviewContent').addEventListener('change',e=>{if(e.target.name==='mealChoice')selectMealCandidate(Number(e.target.value));});$('#mealDate').addEventListener('change',()=>{if($('#mealDate').value){$('#planDate').value=weekStart($('#mealDate').value);renderPlans();}});
+ $('#aiWeekPlan').addEventListener('click',aiWeekPlan);$('#createWeekPlan').addEventListener('click',createWeekPlan);$('#saveWeekPlan').addEventListener('click',saveWeekPlan);$('#replaceWeekCheck').addEventListener('change',()=>{$('#saveWeekPlan').disabled=!$('#replaceWeekCheck').checked;});$('#weekReviewDialog').addEventListener('close',()=>{pendingWeekPlan=null;});$('#createPlan').addEventListener('click',createPlan);$('#aiPlan').addEventListener('click',aiMealPlan);$('#saveAiPlan').addEventListener('click',saveReviewedAiPlan);$('#aiPlanReviewDialog').addEventListener('close',()=>{pendingAiPlan=null;});$('#aiPlanReviewContent').addEventListener('change',e=>{if(e.target.name==='mealChoice')selectMealCandidate(Number(e.target.value));});$('#mealDate').addEventListener('change',()=>{if($('#mealDate').value){$('#planDate').value=weekStart($('#mealDate').value);renderPlans();}});
  $('#planDate').addEventListener('change',()=>{if($('#planDate').value){$('#planDate').value=weekStart($('#planDate').value);renderPlans();}});
  $('#weeklyPlan').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.showRecipe){const [date,slot]=b.dataset.showRecipe.split('|');showRecipe(date,slot);}else if(b.dataset.replaceMeal){const [date,slot]=b.dataset.replaceMeal.split('|');changeMeal(date,slot);}});
  $('#addMissingToWish').addEventListener('click',addMissing);

@@ -4,7 +4,7 @@
 - GitHub: https://github.com/hyogiman/Meal / main
 - 공개 프론트엔드: https://hyogiman.github.io/Meal/ (GitHub Pages)
 - Firebase 프로젝트: **mealplan-786a6** / Functions region **asia-northeast3**
-- OpenAI SDK API 모델: 한 끼 메뉴 후보 gpt-6.1-terra. 사용자 요청으로 사진 인식·첨부는 제거했다.
+- OpenAI SDK API 모델: 주간 식단 및 한 끼 메뉴 후보 gpt-6.1-terra. 사용자 요청으로 사진 인식·첨부는 제거했다.
 - 사용자 계정으로 Firebase 이메일/비밀번호 로그인 및 Firestore 읽기·쓰기 연결 진단은 이미 성공했다고 사용자에게 확인받음.
 - GitHub root index.html은 현재 운영 중인 Meal v2. legacy.html과 v2/ 하위 파일은 **백업/별도 기존 기능**. 삭제하지 말 것.
 
@@ -12,10 +12,11 @@
 1. 공식 Firebase 플러그인 (@Firebase)으로 현재 프로젝트 설정, 실제 Firestore 보안 규칙, Storage 버킷 상태를 **읽어서 검사**한다.
 2. repo의 firestore.rules가 실제 Firestore 구조와 맞는지 확인한다. **현행 규칙을 확인 없이 덮어쓰지 않는다**.
 3. 사진 기능을 다시 노출하지 않는다. 기존 Storage 파일과 규칙은 별도 요청 없이 삭제·변경하지 않는다.
-4. suggestMeals는 mode=single 요청에서 한 끼 후보 3개만 생성한다. 기존 analyzeInventoryPhoto는 종료 안내만 반환한다. 로그인 및 허용 UID 검사를 유지한다. 사용자는 Blaze·OpenAI 비용과 배포를 승인했으며 식단 AI 일일 횟수 제한 제거를 요청했다.
-5. 주간 전체 생성(재고 기반 내장 21끼)과 독립적인 AI 후보 3개 추천을 함께 제공한다. 주간 생성은 미리보기 후 명시적 저장, 기존 주간 교체는 체크 동의 및 동시 변경 검사를 거친다. 끼니별 다시 추천은 해당 끼니만 교체한다. 후보를 본 뒤 적용 날짜·끼니를 바꿀 수 있다. 기본 confirm 자동 처리에 의존하지 않고 재고 수량을 변경하지 않는다.
+4. suggestMeals는 mode=weekly로 7일 21끼, mode=single로 한 끼 후보 3개를 생성한다. 기존 analyzeInventoryPhoto는 종료 안내만 반환한다. 로그인 및 허용 UID 검사를 유지한다. 사용자는 Blaze·OpenAI 비용과 배포를 승인했으며 식단 AI 일일 횟수 제한 제거를 요청했다.
+5. 주간 전체 생성(AI 기본, 내장 21끼 보조)과 독립적인 AI 후보 3개 추천을 함께 제공한다. 주간 생성은 미리보기 후 명시적 저장, 기존 주간 교체는 체크 동의 및 동시 변경 검사를 거친다. 끼니별 다시 추천은 해당 끼니만 교체한다. 후보를 본 뒤 적용 날짜·끼니를 바꿀 수 있다. 기본 confirm 자동 처리에 의존하지 않고 재고 수량을 변경하지 않는다.
 6. 식단은 밥/김치 외에 만들어진 음식이 있다고 가정하지 않는다. 국·반찬은 **별도의 조리시간과 재료**가 필요하다.
-7. 정확한 구매가격 없이 예산과 최종 결제 금액을 꾸며내지 않는다.
+7. 주재료를 중심으로 조리법과 맛을 다양하게 구성한다. 미등록 양념 때문에 메뉴를 제한하지 않고 실제 필요한 양념·향신재료를 각각 계량하여 부족분에 포함한다. 최근 메뉴를 요청에 전달하고 주간 중복을 검사한다.
+8. 정확한 구매가격 없이 예산과 최종 결제 금액을 꾸며내지 않는다.
 
 ## 보호 규칙
 - FIREBASE_SERVICE_ACCOUNT JSON, OpenAI API key, .env 또는 service-account key는 공개 저장소에 커밋하지 않는다.

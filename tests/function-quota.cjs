@@ -3,8 +3,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 let requests=[],transactions=0,incomplete=false,malform=null;
 const db={collection:()=>({limit:()=>({get:async()=>({docs:[]})})}),doc:()=>({get:async()=>({data:()=>({budget:80000})})}),runTransaction:()=>{transactions++;throw Error('No quota writes expected');}};
 class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
-const recipe=i=>({title:'메뉴 '+i,courses:[{title:'요리 '+i,role:'main',minutes:20,requiresRice:true,ingredients:[{name:'돼지고기',qty:300,unit:'g'}],seasonings:[{name:'고춧가루',qty:6,unit:'g'},{name:'진간장',qty:15,unit:'ml'}],steps:['재료를 준비한다.','양념을 섞는다.','충분히 익힌다.','나눈다.']}]});
-class OpenAI{constructor(){this.responses={create:async request=>{requests.push(request);let output=request.text.format.name==='meal_weekly_plan'?{recipes:Array.from({length:14},(_,i)=>recipe(i)),days:Array.from({length:7},(_,i)=>({breakfast:(i*3)%14,lunch:(i*3+1)%14,dinner:(i*3+2)%14}))}:{meals:Array.from({length:3},(_,i)=>recipe(i))};if(malform)malform(output);return {status:incomplete?'incomplete':'completed',output_text:JSON.stringify(output)};}};}}
+const groups=['돼지고기','닭고기','생선','해산물','두부·콩'];
+const ingredients=['돼지고기','닭고기','고등어','새우','두부'];
+const recipe=i=>({title:'메뉴 '+i,mainIngredient:ingredients[i%5],mainCategory:groups[i%5],cookingMethod:['구이','볶음','조림','찜'][i%4],courses:[{title:'요리 '+i,role:'main',minutes:20,requiresRice:true,ingredients:[{name:ingredients[i%5],qty:300,unit:'g'}],seasonings:[{name:'고춧가루',qty:6,unit:'g'},{name:'진간장',qty:15,unit:'ml'}],steps:['재료를 준비한다.','양념을 섞는다.','충분히 익힌다.','나눈다.']}]});
+class OpenAI{constructor(){this.responses={create:async request=>{requests.push(request);let output=request.text.format.name==='meal_weekly_plan'?{recipes:Array.from({length:14},(_,i)=>recipe(i)),days:Array.from({length:7},(_,i)=>({breakfast:i%4,lunch:4+(i*2)%10,dinner:4+(i*2+1)%10}))}:{meals:Array.from({length:3},(_,i)=>recipe(i))};if(malform)malform(output);return {status:incomplete?'incomplete':'completed',output_text:JSON.stringify(output)};}};}}
 const context=vm.createContext({exports:{},console,Date,require:name=>{
  if(name==='firebase-functions/v2/https')return {onCall:(_options,handler)=>handler,HttpsError};
  if(name==='firebase-functions/params')return {defineSecret:name=>({value:()=>name==='MEAL_ALLOWED_UIDS'?'test-family':'test-key'})};
@@ -36,6 +38,11 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,'../functions/index.js'),'ut
   malform=invalid;await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');
  }
  malform=null;incomplete=true;await assert.rejects(context.exports.suggestMeals(request),e=>e.code==='internal');await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');
+ incomplete=false;
+ assert.equal(week.weeklyBudget,80000);assert.equal(Object.keys(week.variety.mainGroups).length,5);
+ for(const invalid of [out=>out.recipes.forEach(m=>m.mainCategory='달걀'),out=>out.recipes.forEach(m=>m.cookingMethod='볶음'),out=>out.recipes[0].mainIngredient='없는재료']){
+  malform=invalid;await assert.rejects(context.exports.suggestMeals(weeklyRequest),e=>e.code==='internal');
+ }
  assert.equal(transactions,0);
  console.log('PASS: single and weekly AI schemas, 7 dates/21 slots across year boundary, 14 varied recipes, seasoning quantities, unlimited requests, auth/input guards, malformed/repetitive/incomplete rejection, photo retirement; no network/writes.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

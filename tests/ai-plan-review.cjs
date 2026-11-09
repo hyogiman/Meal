@@ -9,7 +9,7 @@ function el(id){if(!elements.has(id)){const handlers={};elements.set(id,{value:'
 const context=vm.createContext({console,structuredClone,Date,Intl,crypto:require('node:crypto').webcrypto,
  document:{querySelector:el,querySelectorAll:()=>[]},localStorage:{getItem:()=>null,setItem(){}},setTimeout:()=>0,clearTimeout(){},window:{scrollTo(){}}});
 vm.runInContext(script.replace('initStatic();attachHandlers();renderAll();initFirebase();','')+`
-globalThis.api={planShoppingDetails,shoppingPlanHTML,nutritionEstimate,nutritionAlert,normalizeMealOption,mergeMealIntoPlan,recalculatePlan,buildMeal,recipes:RECIPES,ingredientScale,mealReadyCourse,aiMealPlan,saveReviewedAiPlan,selectMealCandidate,attachHandlers,state,createWeekPlan,saveWeekPlan,changeMeal,aiWeekPlan};
+globalThis.api={openWish,saveWish,planShoppingDetails,shoppingPlanHTML,nutritionEstimate,nutritionAlert,normalizeMealOption,mergeMealIntoPlan,recalculatePlan,buildMeal,recipes:RECIPES,ingredientScale,mealReadyCourse,aiMealPlan,saveReviewedAiPlan,selectMealCandidate,attachHandlers,state,createWeekPlan,saveWeekPlan,changeMeal,aiWeekPlan};
 `,context);
 const a=context.api;
 const raw=(name='달걀',qty=100)=>({title:name+' 요리',courses:[{title:name+' 요리',role:'main',minutes:15,requiresRice:false,ingredients:[{name,qty,unit:'g'}],seasonings:[],steps:['재료를 익힙니다.']}]});
@@ -99,5 +99,13 @@ const plain=x=>JSON.parse(JSON.stringify(x));
  const aiSaved=documents.get('2026-11-16');assert.equal(aiSaved.days.flatMap(d=>d.meals).length,21);assert.equal(aiSaved.source,'AI 주간 추천');
  assert.equal(aiSaved.days[0].meals[0].courses[0].seasonings[0].qty,6);assert.equal(aiSaved.missing.find(x=>x.name==='고춧가루').qty,126);
  assert.equal(JSON.stringify(a.state.inventory),inventoryBefore);
+ // Editing an unpriced shopping item must update it, not duplicate it or create a purchase.
+ const wish={id:'wish-1',name:'새우',qty:600,unit:'g',estimate:null,createdAt:'original',source:'plan'};
+ a.state.wishlist=[wish];el('#wishForm').reset=()=>{};el('#wishForm').dataset={};
+ a.openWish(wish);assert.equal(el('#wishEstimate').value,'');el('#wishQty').value='500';el('#wishEstimate').value='12000';
+ const wishlistWrites=[];context.captureWish=(col,value)=>wishlistWrites.push({col,value:plain(value)});vm.runInContext('upsert=async(col,value)=>captureWish(col,value);',context);
+ await a.saveWish({preventDefault(){}});assert.equal(wishlistWrites.length,1);assert.equal(wishlistWrites[0].col,'wishlist');assert.equal(wishlistWrites[0].value.id,'wish-1');assert.equal(wishlistWrites[0].value.createdAt,'original');assert.equal(wishlistWrites[0].value.estimate,12000);assert.equal(wishlistWrites[0].value.qty,500);
+ el('#wishEstimate').value='-1';await a.saveWish({preventDefault(){}});assert.equal(wishlistWrites.length,1);
+ el('#wishEstimate').value='12000';a.state.wishlist=[];await a.saveWish({preventDefault(){}});assert.equal(wishlistWrites.length,1,'Deleted item must not be recreated');
  console.log('PASS: AI and built-in week previews, explicit save/cancel, malformed slots, nutrition/scaling, seasoning shortages and no double scaling, single-slot replacement preserving 20 meals, flexible placement, concurrent/account guards, inventory unchanged and photo removal. No network or production writes.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

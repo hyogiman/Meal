@@ -9,7 +9,7 @@ function el(id){if(!elements.has(id)){const handlers={};elements.set(id,{value:'
 const context=vm.createContext({console,structuredClone,Date,Intl,crypto:require('node:crypto').webcrypto,
  document:{querySelector:el,querySelectorAll:()=>[]},localStorage:{getItem:()=>null,setItem(){}},setTimeout:()=>0,clearTimeout(){},window:{scrollTo(){}}});
 vm.runInContext(script.replace('initStatic();attachHandlers();renderAll();initFirebase();','')+`
-globalThis.api={nutritionEstimate,nutritionAlert,normalizeMealOption,mergeMealIntoPlan,recalculatePlan,buildMeal,recipes:RECIPES,ingredientScale,mealReadyCourse,aiMealPlan,saveReviewedAiPlan,selectMealCandidate,attachHandlers,state,createWeekPlan,saveWeekPlan,changeMeal,aiWeekPlan};
+globalThis.api={planShoppingDetails,shoppingPlanHTML,nutritionEstimate,nutritionAlert,normalizeMealOption,mergeMealIntoPlan,recalculatePlan,buildMeal,recipes:RECIPES,ingredientScale,mealReadyCourse,aiMealPlan,saveReviewedAiPlan,selectMealCandidate,attachHandlers,state,createWeekPlan,saveWeekPlan,changeMeal,aiWeekPlan};
 `,context);
 const a=context.api;
 const raw=(name='달걀',qty=100)=>({title:name+' 요리',courses:[{title:name+' 요리',role:'main',minutes:15,requiresRice:false,ingredients:[{name,qty,unit:'g'}],seasonings:[],steps:['재료를 익힙니다.']}]});
@@ -23,6 +23,14 @@ const plain=x=>JSON.parse(JSON.stringify(x));
  const high=a.normalizeMealOption(raw('밥',300),1),low=a.normalizeMealOption(raw('닭고기',200),1),unknown=a.normalizeMealOption(raw('알수없는재료',200),1);
  assert.match(a.nutritionAlert(high.nutrition),/높습니다/);assert.equal(a.nutritionAlert(low.nutrition),'');assert.match(a.nutritionAlert(unknown.nutrition),/보류/);
  const target={date:'2026-11-04',slot:'저녁',startDate:'2026-11-02',maxMinutes:35};
+ const newMenu=a.normalizeMealOption({...raw('새우',600),mainIngredient:'새우',mainCategory:'해산물',cookingMethod:'볶음'},2);
+ const shoppingPlan=a.mergeMealIntoPlan(null,target,newMenu,[]),pantry=[{name:'달걀',qty:30,unit:'개'},{name:'양배추',qty:2,unit:'kg'}];
+ const priced=a.planShoppingDetails(shoppingPlan,pantry,[{name:'새우',qty:.5,unit:'kg',estimate:12000}]);
+ assert.equal(priced.newMains[0].name,'새우');assert.equal(priced.subtotal,24000,'Round up listed purchase lots, do not treat lot price as unit price');assert.equal(priced.unknown,0);
+ const partial=a.planShoppingDetails(shoppingPlan,[...pantry,{name:'새우',qty:.2,unit:'kg'}],[]);
+ assert.equal(partial.items[0].qty,400);assert.equal(partial.newMains.length,0);assert.equal(partial.unknown,1);assert.equal(partial.groups['해산물'],1);
+ assert.match(a.shoppingPlanHTML(shoppingPlan),/예산 충족 여부는 아직 알 수 없습니다/);
+ assert.equal(a.planShoppingDetails(shoppingPlan,[{name:'새우',qty:1,unit:'kg'}],[]).items.length,0);
  const first=a.mergeMealIntoPlan(null,target,aiOne,[]);assert.equal(first.days.length,7);assert.equal(first.days.flatMap(x=>x.meals).length,1);
  const existing=a.mergeMealIntoPlan(first,{...target,slot:'아침'},low,[]),before=JSON.stringify(existing);
  const replaced=a.mergeMealIntoPlan(existing,target,high,[]);

@@ -17,6 +17,11 @@ dialog{border:1px solid #dbe8dd;border-radius:20px;padding:0;box-shadow:0 25px 1
 @media(max-width:620px){.bar-inner{padding:11px 13px}.brand{font-size:19px}.brand small{font-size:9px}.sync-pill{font-size:10px;padding:5px 7px}.small-button{font-size:11px;padding:6px 9px}.page-heading{padding:27px 23px}.page-heading h1{font-size:29px}.hero-symbol{display:none}.section-heading h1{font-size:26px}.section-heading .primary{width:100%}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metrics .metric:first-child{grid-column:span 2}.metric{padding:14px}.metric strong{font-size:23px}.home-grid,.two-columns{grid-template-columns:1fr}.panel{padding:17px}.stock-grid{grid-template-columns:1fr}.budget-band{padding:13px;gap:5px}.budget-band span{font-size:10px}.budget-band strong{font-size:18px}.tools-line select{max-width:calc(50% - 5px);flex:1}.search-field{flex-basis:100%}.dialog-body{padding:18px}.form-grid{gap:9px}.form-grid .field span{font-size:11px}.form-grid{grid-template-columns:1fr 1fr}.plan-stats{grid-template-columns:1fr}.control-grid{gap:8px}.plan-buttons>*{flex:1;min-width:130px}.detail-grid{grid-template-columns:1fr}}
 @media print{body{background:#fff}.topbar,.sidebar,.mobile-nav,.plan-buttons,.meal-actions{display:none!important}.app-shell{display:block}.page-content{padding:0}.panel,.day-card{break-inside:avoid;box-shadow:none}.day-meals{display:grid;grid-template-columns:repeat(3,1fr)}.meal-card{border-right:1px solid #ddd;border-bottom:0}}
 
+#shoppingSelectItems{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:16px 0}
+#shoppingSelectItems .check-row{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:10px;line-height:1.5;cursor:pointer}
+#shoppingSelectItems input{width:18px;height:18px;margin:2px 0 0;flex-shrink:0;accent-color:var(--green)}
+#shoppingSelectItems .check-row:has(input:checked){background:#e8f3ea;border-color:#7cb7a0}
+#shoppingSelectItems .check-row:has(input:disabled){opacity:.6;cursor:default}
 </style></head>
 <body>
 <header class="topbar"><div class="bar-inner"><button class="brand" id="goHome" type="button"><span class="brand-icon">◧</span><span>Meal <small>우리 집 식탁 매니저</small></span></button><div class="top-tools"><span id="syncBadge" class="sync-pill">● 연결 준비 중</span><button id="authToggle" class="small-button" type="button">로그인</button></div></div></header>
@@ -483,7 +488,7 @@ function shoppingChoices(plan,inventory,wishlist){return recalculatePlan(plan,in
 function openShoppingSelection(plan,label='선택한 식단'){
  if(!plan)return;const items=shoppingChoices(plan,state.inventory,state.wishlist);
  pendingShopping={plan:structuredClone(plan),items:items.map(x=>({...x,id:createUID()})),mode:state.mode,user:state.user?.uid||null};
- $('#shoppingSelectInfo').textContent=label;$('#shoppingSelectError').textContent='';$('#saveShoppingSelection').disabled=true;
+ $('#shoppingSelectInfo').textContent=label;$('#shoppingSelectError').textContent='';$('#saveShoppingSelection').disabled=true;$('#saveShoppingSelection').textContent='선택한 재료 담기';
  $('#shoppingSelectItems').innerHTML=items.length?items.map((x,i)=>`<label class="check-row"><input type="checkbox" name="shoppingIngredient" value="${i}" ${x.already?'disabled':''}><span><strong>${esc(x.name)}</strong> ${x.qty}${esc(x.unit)}${x.already?' · 이미 장보기 목록에 있음':''}</span></label>`).join(''):'<p>현재 재고로 충족되어 추가 구매할 재료가 없습니다.</p>';
  openModal('shoppingSelectDialog');
 }

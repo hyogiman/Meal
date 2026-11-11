@@ -9,6 +9,7 @@ const a=context.api;a.attachHandlers();
 (async()=>{
  const main={title:'생선구이',role:'main',requiresRice:true,minutes:20,ingredients:[{name:'고등어',qty:300,unit:'g'}],seasonings:[],steps:['익힌다']},soup={...main,title:'된장찌개',role:'soup'},side={...main,title:'나물',role:'side'};
  const meal={title:'구이 상차림',courses:[main,soup,side],servings:2,minutes:30,slot:'저녁'};
+ assert.equal(a.boardCourses({courses:[{title:'고등어 김치찌개',role:'main'}]})[0].label,'국·찌개','Soup dishes remain recognizable when AI marks them as the main course');
  const plan={id:'2026-11-09',servings:2,days:[{date:'2026-11-09',meals:[meal]}]};a.state.plans=[plan];el('#menuWeek').value=plan.id;el('#planDate').value='2026-12-07';const before=JSON.stringify(a.state);
  a.renderMenuBoard();const board=el('#menuBoard').innerHTML;
  assert.equal((board.match(/<article/g)||[]).length,7);assert.equal((board.match(/class="menu-slot"/g)||[]).length,21);assert.match(board,/된장찌개/);assert.match(board,/국·찌개/);assert.match(board,/나물/);assert.match(board,/밥 · 김치/);assert.equal(el('#menuWeekCount').textContent,'1 / 21끼 준비');assert.equal(JSON.stringify(a.state),before);

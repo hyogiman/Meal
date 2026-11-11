@@ -20,6 +20,9 @@
 
 - 장보기 추가는 주간·개별 메뉴·후보에서 재료 체크 후 명시적으로 실행한다. 기본 미선택, 취소 시 무쓰기, 이미 목록에 있는 재료 중복 방지, 제출 시 최신 재고 차감을 유지한다.
 
+- 주간 메뉴판은 `#menu` 경로로 별도 제공한다. 저장된 레시피만 표시하고 메뉴판 열기·주 이동 시 AI 호출이나 데이터 쓰기를 하지 않는다.
+- 네이티브 `confirm`/`alert`/`prompt`를 다시 도입하지 않는다. `askConfirmation`은 비동기 모달이며 취소·닫기·계정 변경 시 false다.
+
 ## 보호 규칙
 - FIREBASE_SERVICE_ACCOUNT JSON, OpenAI API key, .env 또는 service-account key는 공개 저장소에 커밋하지 않는다.
 - Firebase client apiKey는 공개 앱 식별용 설정이고 OpenAI API key와 다르다.
@@ -42,7 +45,7 @@
 - node --check functions/index.js
 - node --check v2/recipes.js
 - GitHub Pages 운영 화면 확인: 로그인 → Firestore 연결 진단 → 냉장고에서 수량 등록/수정 → 다른 기기 동기화
-- node tests/function-quota.cjs, node tests/ai-plan-review.cjs, node tests/plan-shopping.cjs
+- node tests/function-quota.cjs, node tests/ai-plan-review.cjs, node tests/plan-shopping.cjs, node tests/menu-modal.cjs
 - 실제 AI 시험은 후보 확인 후 닫기까지 수행한다. 운영 식단을 시험용으로 임의 저장하지 않는다.
 - 영양정보는 재료 기반 추정치다. 재료량 기준(내장 2인분 / AI 요청 인원 전체)을 구분하고 미확인 재료는 표시한다. 탄수화물 65% 초과 안내는 참고용이며 자료가 불완전하면 판정을 보류한다.
 
